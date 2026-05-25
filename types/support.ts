@@ -20,6 +20,9 @@ export type TroubleshootingContext = {
   solutionGiven: boolean;
   solvedStatus: SolvedStatus;
   productInfoAsked?: boolean;
+  awaitingLocation?: boolean;
+  escalationActive?: boolean;
+  escalationCompleted?: boolean;
 };
 
 export type LocalSupportTicket = {
@@ -39,6 +42,9 @@ export type LocalSupportTicket = {
   userAnswers: string[];
   solutionGiven: boolean;
   solvedStatus: SolvedStatus;
+  awaitingLocation: boolean;
+  escalationActive: boolean;
+  escalationCompleted: boolean;
   category: string;
   issue: string;
   solution: string;

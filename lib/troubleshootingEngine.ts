@@ -73,6 +73,11 @@ type LegacyEngineResult = {
   context: Partial<LocalSupportTicket>;
 };
 
+type LocationReply = {
+  text: string;
+  locationFound: boolean;
+};
+
 function flowId(flow: TroubleshootingFlow) {
   return `${flow.category}::${flow.issueType}`;
 }
@@ -234,21 +239,39 @@ function purchaseLocationReply(language: ReplyLanguage) {
     : 'Thank you. Our sales team can contact you based on your location. Please share your phone number or contact your nearest Excel sales point.';
 }
 
-function locationSupportReply(message: string, language: ReplyLanguage) {
+function locationSupportReply(message: string, language: ReplyLanguage): LocationReply {
   const text = normalizeText(message);
   const location = locations.find((item) =>
     item.keywords.some((keyword) => text.includes(normalizeText(keyword)))
   );
 
   if (!location) {
-    return language === 'bn'
-      ? 'ধন্যবাদ। অনুগ্রহ করে আপনার জেলা/লোকেশন আরেকটু পরিষ্কারভাবে লিখুন। আপনি চাইলে এখানে নিকটস্থ support point দেখতে পারেন: https://www.excelbd.com/support/'
-      : 'Thank you. Please write your district/location more clearly. You may also find your nearest support point here: https://www.excelbd.com/support/';
+    return {
+      text: language === 'bn'
+        ? 'ধন্যবাদ। অনুগ্রহ করে আপনার জেলা/লোকেশন আরেকটু পরিষ্কারভাবে লিখুন। আপনি চাইলে এখানে নিকটস্থ support point দেখতে পারেন: https://www.excelbd.com/support/'
+        : 'Thank you. Please write your district/location more clearly. You may also find your nearest support point here: https://www.excelbd.com/support/',
+      locationFound: false,
+    };
   }
 
+  return {
+    text: language === 'bn'
+      ? `ধন্যবাদ। আপনার নিকটস্থ Excel Customer Support Point:\n\n${location.address}\nContact: ${location.phone}\nEngineer contact: ${location.engineerPhone}\n\nযদি আপনি পণ্য পাঠাতে বা আসতে না পারেন, engineer contact নম্বরে যোগাযোগ করুন।`
+      : `Thank you. Your nearest Excel Customer Support Point:\n\n${location.address}\nContact: ${location.phone}\nEngineer contact: ${location.engineerPhone}\n\nIf you cannot visit or send the product, please contact the CSP engineer.`,
+    locationFound: true,
+  };
+}
+
+function postEscalationPrompt(language: ReplyLanguage) {
   return language === 'bn'
-    ? `ধন্যবাদ। আপনার নিকটস্থ Excel Customer Support Point:\n\n${location.address}\nContact: ${location.phone}\nEngineer contact: ${location.engineerPhone}\n\nযদি আপনি পণ্য পাঠাতে বা আসতে না পারেন, engineer contact নম্বরে যোগাযোগ করুন।`
-    : `Thank you. Your nearest Excel Customer Support Point:\n\n${location.address}\nContact: ${location.phone}\nEngineer contact: ${location.engineerPhone}\n\nIf you cannot visit or send the product, please contact the CSP engineer.`;
+    ? 'আপনার যদি অন্য কোনো সমস্যা বা প্রশ্ন থাকে, অনুগ্রহ করে লিখুন।'
+    : 'If you have any other support issue or query, please write it.';
+}
+
+function postEscalationClosingReply(language: ReplyLanguage) {
+  return language === 'bn'
+    ? 'ধন্যবাদ। আপনার যদি অন্য কোনো Excel product support সমস্যা থাকে, অনুগ্রহ করে লিখুন।'
+    : 'Thank you. If you have any other Excel product support issue, please write it.';
 }
 
 function purchaseQuestion(language: ReplyLanguage, includeIntro: boolean, flow: TroubleshootingFlow) {
@@ -286,7 +309,8 @@ function buildContext(
   askedQuestions: string[],
   userAnswers: string[],
   solutionGiven: boolean,
-  solvedStatus: SolvedStatus
+  solvedStatus: SolvedStatus,
+  extra: Partial<LocalSupportTicket> = {}
 ) {
   return {
     category: flow.category,
@@ -299,6 +323,10 @@ function buildContext(
     userAnswers,
     solutionGiven,
     solvedStatus,
+    awaitingLocation: false,
+    escalationActive: false,
+    escalationCompleted: false,
+    ...extra,
   };
 }
 
@@ -323,19 +351,58 @@ function result(
 export function getNextTroubleshootingResponse(input: TroubleshootingInput): TroubleshootingOutput {
   const language = input.language || detectLanguage(input.message);
   const analysis = analyzeSupportMessage(input.message);
-  const selectedCategory = categoryFromContext(input.ticketState, input.selectedCategory) || analysis.category;
+  let ticketState = input.ticketState || {};
+
+  if (ticketState.escalationCompleted) {
+    if (!analysis.isSupportRelated || analysis.isNonSupport) {
+      return {
+        responseText: postEscalationClosingReply(language),
+        updatedTicketState: ticketState,
+        detectedCategory: categoryFromContext(ticketState, input.selectedCategory),
+        detectedIssueType: ticketState.issueType || '',
+        needsCategorySelection: false,
+        matched: false,
+        language,
+      };
+    }
+
+    ticketState = {
+      ...ticketState,
+      category: analysis.category || input.selectedCategory || ticketState.category,
+      selectedCategory: analysis.category || input.selectedCategory || ticketState.selectedCategory,
+      issueType: '',
+      currentFlowId: '',
+      currentQuestionIndex: 0,
+      currentStep: 0,
+      askedQuestions: [],
+      userAnswers: [],
+      solutionGiven: false,
+      solvedStatus: 'pending',
+      awaitingLocation: false,
+      escalationActive: false,
+      escalationCompleted: false,
+    };
+  }
+
+  const categoryHint = input.ticketState?.escalationCompleted && analysis.category
+    ? analysis.category
+    : input.selectedCategory;
+  const selectedCategory = categoryFromContext(ticketState, categoryHint) || analysis.category;
 
   if (isHumanHelpRequest(input.message)) {
-    const knownCategory = categoryFromContext(input.ticketState, input.selectedCategory);
+    const knownCategory = categoryFromContext(ticketState, input.selectedCategory);
 
     return {
       responseText: escalationLocationReply(language),
       updatedTicketState: {
-        ...input.ticketState,
+        ...ticketState,
         solvedStatus: 'not_solved',
+        awaitingLocation: true,
+        escalationActive: true,
+        escalationCompleted: false,
       },
       detectedCategory: knownCategory,
-      detectedIssueType: input.ticketState?.issueType || analysis.issueType,
+      detectedIssueType: ticketState.issueType || analysis.issueType,
       needsCategorySelection: false,
       matched: false,
       language,
@@ -346,7 +413,7 @@ export function getNextTroubleshootingResponse(input: TroubleshootingInput): Tro
     if (analysis.isNonSupport || !analysis.isSupportRelated) {
       return {
         responseText: nonSupportReply(language),
-        updatedTicketState: input.ticketState || {},
+        updatedTicketState: ticketState,
         detectedCategory: '',
         detectedIssueType: '',
         needsCategorySelection: false,
@@ -357,7 +424,7 @@ export function getNextTroubleshootingResponse(input: TroubleshootingInput): Tro
 
     return {
       responseText: categorySelectionReply(language),
-      updatedTicketState: input.ticketState || {},
+      updatedTicketState: ticketState,
       detectedCategory: '',
       detectedIssueType: '',
       needsCategorySelection: true,
@@ -367,19 +434,19 @@ export function getNextTroubleshootingResponse(input: TroubleshootingInput): Tro
   }
 
   const existingFlow =
-    findFlowById(input.ticketState?.currentFlowId) ||
-    (input.ticketState?.issueType
+    findFlowById(ticketState.currentFlowId) ||
+    (ticketState.issueType
       ? flows.find(
           (flow) =>
             sameCategory(flow.category, selectedCategory) &&
-            normalizeText(flow.issueType) === normalizeText(input.ticketState?.issueType || '')
+            normalizeText(flow.issueType) === normalizeText(ticketState.issueType || '')
         )
       : undefined);
 
   if (!existingFlow && analysis.isNonSupport) {
     return {
       responseText: nonSupportReply(language),
-      updatedTicketState: input.ticketState || {},
+      updatedTicketState: ticketState,
       detectedCategory: selectedCategory,
       detectedIssueType: '',
       needsCategorySelection: false,
@@ -400,7 +467,7 @@ export function getNextTroubleshootingResponse(input: TroubleshootingInput): Tro
     return {
       responseText: noExactSolutionReply(language),
       updatedTicketState: {
-        ...input.ticketState,
+        ...ticketState,
         category: selectedCategory,
         selectedCategory,
         issueType: analysis.issueType,
@@ -409,6 +476,9 @@ export function getNextTroubleshootingResponse(input: TroubleshootingInput): Tro
         currentStep: 0,
         solutionGiven: false,
         solvedStatus: 'not_solved',
+        awaitingLocation: true,
+        escalationActive: true,
+        escalationCompleted: false,
       },
       detectedCategory: selectedCategory,
       detectedIssueType: analysis.issueType,
@@ -432,7 +502,7 @@ export function getNextTroubleshootingResponse(input: TroubleshootingInput): Tro
     return {
       responseText,
       updatedTicketState: {
-        ...input.ticketState,
+        ...ticketState,
         category: selectedCategory,
         selectedCategory,
         issueType: '',
@@ -441,6 +511,9 @@ export function getNextTroubleshootingResponse(input: TroubleshootingInput): Tro
         currentStep: 0,
         solutionGiven: false,
         solvedStatus: 'pending',
+        awaitingLocation: false,
+        escalationActive: false,
+        escalationCompleted: false,
       },
       detectedCategory: selectedCategory,
       detectedIssueType: '',
@@ -451,22 +524,40 @@ export function getNextTroubleshootingResponse(input: TroubleshootingInput): Tro
   }
 
   const flow = match.flow;
-  const askedQuestions = input.ticketState?.askedQuestions || [];
-  const userAnswers = input.ticketState?.userAnswers || [];
+  const askedQuestions = ticketState.askedQuestions || [];
+  const userAnswers = ticketState.userAnswers || [];
   const currentQuestionIndex =
-    input.ticketState?.currentQuestionIndex ?? input.ticketState?.currentStep ?? 0;
-  const solutionGiven = Boolean(input.ticketState?.solutionGiven);
+    ticketState.currentQuestionIndex ?? ticketState.currentStep ?? 0;
+  const solutionGiven = Boolean(ticketState.solutionGiven);
   const questionLimit = Math.min(flow.questions.length, 3);
 
   if (
-    input.ticketState?.solvedStatus === 'not_solved' &&
+    ticketState.awaitingLocation &&
+    ticketState.escalationActive &&
     !isSolved(input.message) &&
     !isNotSolved(input.message)
   ) {
+    const locationReply = locationSupportReply(input.message, language);
+    const responseText = locationReply.locationFound
+      ? `${locationReply.text}\n\n${postEscalationPrompt(language)}`
+      : locationReply.text;
+
     return result(
       flow,
-      locationSupportReply(input.message, language),
-      buildContext(flow, currentQuestionIndex, askedQuestions, [...userAnswers, input.message], true, 'not_solved'),
+      responseText,
+      buildContext(
+        flow,
+        currentQuestionIndex,
+        askedQuestions,
+        [...userAnswers, input.message],
+        true,
+        'not_solved',
+        {
+          awaitingLocation: !locationReply.locationFound,
+          escalationActive: !locationReply.locationFound,
+          escalationCompleted: locationReply.locationFound,
+        }
+      ),
       language,
       true
     );
@@ -486,7 +577,11 @@ export function getNextTroubleshootingResponse(input: TroubleshootingInput): Tro
     return result(
       flow,
       escalationLocationReply(language),
-      buildContext(flow, currentQuestionIndex, askedQuestions, userAnswers, true, 'not_solved'),
+      buildContext(flow, currentQuestionIndex, askedQuestions, userAnswers, true, 'not_solved', {
+        awaitingLocation: true,
+        escalationActive: true,
+        escalationCompleted: false,
+      }),
       language,
       true
     );
