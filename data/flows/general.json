@@ -1,0 +1,29 @@
+[
+  {
+    "category": "General",
+    "issueType": "Service Center",
+    "symptoms": ["service center", "customer support point", "support center", "csp", "সার্ভিস সেন্টার"],
+    "questions": ["Which location or district are you in?"],
+    "solutionSteps": ["Visit the Excel support page.", "Choose your nearest support point.", "Take product serial number and invoice if service is needed."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "Support point list: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "General",
+    "issueType": "Contact Support",
+    "symptoms": ["contact support", "helpline", "phone number", "যোগাযোগ"],
+    "questions": ["Which product do you need support for?", "Which area are you from?"],
+    "solutionSteps": ["Visit the Excel support page.", "Select nearest Customer Support Point.", "Contact them with product model and issue details."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "Support page: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "General",
+    "issueType": "Other Issue",
+    "symptoms": ["other issue", "other problem", "general support", "help"],
+    "questions": ["Which product are you using?", "What problem are you facing?", "When did the issue start?"],
+    "solutionSteps": ["Share product model.", "Share serial number if available.", "Describe the problem with any error message.", "Excel support can guide next steps."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "For more help, contact Excel support: https://www.excelbd.com/support/"
+  }
+]

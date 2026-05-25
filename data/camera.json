@@ -1,0 +1,50 @@
+[
+  {
+    "category": "Camera / DVR / NVR",
+    "keywords": ["camera offline", "camera not showing", "nvr offline", "ip camera offline", "ক্যামেরা অফলাইন"],
+    "solution": {
+      "en": "Check camera power, adapter, LAN cable, PoE switch, and NVR network settings. Restart the camera and NVR, then confirm the camera IP is reachable.",
+      "bn": "camera power, adapter, LAN cable, PoE switch এবং NVR network settings check করুন। camera ও NVR restart করে camera IP reachable কি না দেখুন।"
+    },
+    "escalation_message": {
+      "en": "If the camera stays offline, share camera model, NVR model, and network connection type.",
+      "bn": "camera offline থাকলে camera model, NVR model এবং network connection type লিখুন।"
+    }
+  },
+  {
+    "category": "Camera / DVR / NVR",
+    "keywords": ["dvr no display", "nvr no display", "no display", "monitor no signal", "ডিভিআর ডিসপ্লে নেই"],
+    "solution": {
+      "en": "Check DVR/NVR power, HDMI/VGA cable, monitor input source, and display resolution. Try another monitor or cable if possible.",
+      "bn": "DVR/NVR power, HDMI/VGA cable, monitor input source এবং display resolution check করুন। সম্ভব হলে অন্য monitor বা cable দিয়ে test করুন।"
+    },
+    "escalation_message": {
+      "en": "If there is still no display, share device model and what appears on the monitor.",
+      "bn": "display না এলে device model এবং monitor-এ কী দেখাচ্ছে তা লিখুন।"
+    }
+  },
+  {
+    "category": "Camera / DVR / NVR",
+    "keywords": ["night vision problem", "infrared problem", "ir not working", "night mode", "নাইট ভিশন"],
+    "solution": {
+      "en": "Clean the camera glass, check IR LED settings, confirm there is enough power, and remove objects reflecting light near the lens.",
+      "bn": "camera glass clean করুন, IR LED settings check করুন, power ঠিক আছে কি না দেখুন এবং lens এর কাছে light reflect করে এমন object সরান।"
+    },
+    "escalation_message": {
+      "en": "If night vision still fails, share camera model and a photo of the night image.",
+      "bn": "night vision সমস্যা থাকলে camera model এবং night image এর photo দিন।"
+    }
+  },
+  {
+    "category": "Camera / DVR / NVR",
+    "keywords": ["recording issue", "not recording", "recording missing", "hard disk issue", "hdd error", "হার্ডডিস্ক সমস্যা", "রেকর্ডিং হচ্ছে না"],
+    "solution": {
+      "en": "Check HDD status in DVR/NVR settings, confirm recording schedule is enabled, format the HDD only after backup, and check date/time settings.",
+      "bn": "DVR/NVR settings থেকে HDD status check করুন, recording schedule enabled আছে কি না দেখুন, backup নেওয়ার পরই HDD format করুন এবং date/time settings check করুন।"
+    },
+    "escalation_message": {
+      "en": "If recording is still missing, share HDD status, storage size, and DVR/NVR model.",
+      "bn": "recording না থাকলে HDD status, storage size এবং DVR/NVR model লিখুন।"
+    }
+  }
+]

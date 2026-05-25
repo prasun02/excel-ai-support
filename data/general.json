@@ -1,0 +1,38 @@
+[
+  {
+    "category": "General",
+    "keywords": ["service center", "customer support point", "support center", "csp", "সার্ভিস সেন্টার", "সাপোর্ট পয়েন্ট"],
+    "solution": {
+      "en": "You can find Excel Customer Support Point information from the official support page.",
+      "bn": "Excel Customer Support Point তথ্য official support page থেকে পাওয়া যাবে।"
+    },
+    "escalation_message": {
+      "en": "Visit https://www.excelbd.com/support/ and choose your nearest support point.",
+      "bn": "https://www.excelbd.com/support/ ভিজিট করে nearest support point নির্বাচন করুন।"
+    }
+  },
+  {
+    "category": "General",
+    "keywords": ["contact support", "helpline", "phone number", "যোগাযোগ", "সাপোর্ট নাম্বার"],
+    "solution": {
+      "en": "For direct support, contact your nearest Excel Customer Support Point from the official support page.",
+      "bn": "direct support এর জন্য official support page থেকে nearest Excel Customer Support Point-এ যোগাযোগ করুন।"
+    },
+    "escalation_message": {
+      "en": "Support page: https://www.excelbd.com/support/",
+      "bn": "Support page: https://www.excelbd.com/support/"
+    }
+  },
+  {
+    "category": "General",
+    "keywords": ["buy product", "dealer location", "dealer", "product price", "price", "কিনতে চাই", "ডিলার", "দাম"],
+    "solution": {
+      "en": "For product price, availability, and dealer location, contact Excel sales/support from the official website.",
+      "bn": "product price, availability এবং dealer location জানতে official website থেকে Excel sales/support-এ যোগাযোগ করুন।"
+    },
+    "escalation_message": {
+      "en": "Visit https://www.excelbd.com/support/ for support and contact details.",
+      "bn": "support এবং contact details জানতে https://www.excelbd.com/support/ ভিজিট করুন।"
+    }
+  }
+]

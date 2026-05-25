@@ -1,0 +1,47 @@
+[
+  {
+    "category": "Camera / DVR / NVR",
+    "issueType": "Camera Offline",
+    "symptoms": ["camera offline", "camera not showing", "ip camera offline", "ক্যামেরা অফলাইন"],
+    "questions": ["Is the camera getting power?", "Is the LAN/PoE cable connected?", "Is the camera connected to DVR/NVR or network switch?"],
+    "solutionSteps": ["Check camera power adapter or PoE switch.", "Check LAN cable connection.", "Restart camera and DVR/NVR.", "Confirm camera IP is reachable.", "Check NVR channel settings."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If camera remains offline, contact Excel support: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "Camera / DVR / NVR",
+    "issueType": "DVR No Display",
+    "symptoms": ["dvr no display", "no display", "monitor no signal", "ডিভিআর ডিসপ্লে নেই"],
+    "questions": ["Is DVR power light on?", "Are you using HDMI or VGA?", "Is the monitor input source correct?"],
+    "solutionSteps": ["Check DVR power.", "Check HDMI/VGA cable.", "Select correct monitor input source.", "Try another display cable.", "Restart DVR."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If display is still not available, contact Excel support: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "Camera / DVR / NVR",
+    "issueType": "NVR Camera Not Showing",
+    "symptoms": ["nvr camera not showing", "nvr offline", "nvr no camera"],
+    "questions": ["Are cameras connected through PoE?", "Are camera IP addresses in the same network?", "Did this start after a network change?"],
+    "solutionSteps": ["Check PoE switch or NVR PoE ports.", "Confirm camera IP and NVR IP are in the same range.", "Restart NVR and cameras.", "Add camera again from NVR camera management."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If cameras still do not show, contact Excel support: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "Camera / DVR / NVR",
+    "issueType": "Recording Problem",
+    "symptoms": ["recording issue", "not recording", "recording missing", "রেকর্ডিং হচ্ছে না"],
+    "questions": ["Is HDD detected in DVR/NVR?", "Is recording schedule enabled?", "Is date/time correct?"],
+    "solutionSteps": ["Check HDD status in storage settings.", "Enable recording schedule.", "Correct date and time.", "Format HDD only after backup.", "Restart DVR/NVR."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If recording is still missing, contact Excel support: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "Camera / DVR / NVR",
+    "issueType": "Night Vision Problem",
+    "symptoms": ["night vision problem", "ir not working", "night mode", "নাইট ভিশন"],
+    "questions": ["Is the camera glass clean?", "Is IR mode enabled?", "Is there any object reflecting light near the camera?"],
+    "solutionSteps": ["Clean the camera glass.", "Check IR/night mode settings.", "Ensure camera has proper power.", "Remove objects reflecting light near lens.", "Restart the camera."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If night vision still fails, contact Excel support: https://www.excelbd.com/support/"
+  }
+]

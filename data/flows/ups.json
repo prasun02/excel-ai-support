@@ -1,0 +1,47 @@
+[
+  {
+    "category": "UPS / Inverter",
+    "issueType": "No Backup",
+    "symptoms": ["no backup", "backup problem", "backup low", "ব্যাকআপ নেই"],
+    "questions": ["How old is the battery?", "What devices are connected?", "Was the UPS fully charged?"],
+    "solutionSteps": ["Charge UPS/Inverter fully.", "Reduce connected load.", "Test with one low-power device.", "Check battery age.", "Replace battery if old or weak."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If backup is still low, contact Excel support: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "UPS / Inverter",
+    "issueType": "Battery Low",
+    "symptoms": ["battery low", "battery problem", "battery replace", "ব্যাটারি লো"],
+    "questions": ["How long has the battery been used?", "Does battery warning continue after charging?", "Is the battery swollen?"],
+    "solutionSteps": ["Charge for 6-8 hours.", "Check battery terminals.", "Reduce load.", "Replace old or swollen battery."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If battery warning continues, contact Excel support: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "UPS / Inverter",
+    "issueType": "UPS Alarm",
+    "symptoms": ["ups alarm", "beeping", "alarm", "এলার্ম"],
+    "questions": ["Is the alarm continuous or occasional?", "What devices are connected?", "Is input power stable?"],
+    "solutionSteps": ["Check input power.", "Remove extra load.", "Restart UPS.", "Check battery status.", "Test with minimum load."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If alarm continues, contact Excel support: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "UPS / Inverter",
+    "issueType": "Overload",
+    "symptoms": ["overload", "load problem", "ওভারলোড"],
+    "questions": ["What devices are connected?", "What is UPS capacity?", "Does alarm stop after removing load?"],
+    "solutionSteps": ["Remove high-power devices.", "Keep load within rated capacity.", "Restart UPS.", "Reconnect devices one by one."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If overload remains, contact Excel support: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "UPS / Inverter",
+    "issueType": "Inverter Not Charging",
+    "symptoms": ["inverter not charging", "not charging", "charging problem", "চার্জ হচ্ছে না"],
+    "questions": ["Is input voltage available?", "Is charger indicator on?", "Are battery terminals connected?"],
+    "solutionSteps": ["Check input voltage.", "Check charging cable.", "Check battery terminal.", "Check fuse if available.", "Keep inverter connected to stable power."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If inverter still does not charge, contact Excel support: https://www.excelbd.com/support/"
+  }
+]

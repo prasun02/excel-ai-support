@@ -1,0 +1,26 @@
+[
+  {
+    "category": "New Product Purchase",
+    "keywords": [
+      "buy product",
+      "purchase product",
+      "new product",
+      "want to buy",
+      "product purchase",
+      "product price",
+      "dealer contact",
+      "sales contact",
+      "নতুন পণ্য",
+      "পণ্য কিনতে চাই",
+      "প্রোডাক্ট কিনতে চাই"
+    ],
+    "solution": {
+      "en": "For product purchase support, please mention your desired location. Then we can help connect you with the appropriate sales contact person.",
+      "bn": "পণ্য ক্রয়ের জন্য অনুগ্রহ করে আপনার কাঙ্ক্ষিত লোকেশন লিখুন। এরপর আমরা আপনাকে সংশ্লিষ্ট সেলস কন্টাক্ট পারসনের সাথে সংযুক্ত করতে সহায়তা করব।"
+    },
+    "escalation_message": {
+      "en": "After you share your location, we can guide you to the right sales contact.",
+      "bn": "আপনার লোকেশন জানালে আমরা আপনাকে সঠিক sales contact সম্পর্কে গাইড করতে পারব।"
+    }
+  }
+]

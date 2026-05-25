@@ -1,0 +1,38 @@
+[
+  {
+    "category": "Warranty",
+    "issueType": "Warranty Check",
+    "symptoms": ["warranty check", "check warranty", "warranty status", "ওয়ারেন্টি চেক"],
+    "questions": ["Do you have the product serial number?", "Do you have purchase invoice?", "What is the product model?"],
+    "solutionSteps": ["Keep serial number ready.", "Keep purchase invoice ready.", "Contact nearest Excel support point for warranty record check."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "For warranty check, contact Excel support: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "Warranty",
+    "issueType": "Warranty Expired",
+    "symptoms": ["warranty expired", "expired warranty", "warranty over", "ওয়ারেন্টি শেষ"],
+    "questions": ["When was the product purchased?", "What is the serial number?", "What issue are you facing?"],
+    "solutionSteps": ["Check purchase date.", "Check serial number.", "If expired, paid service may be available after inspection."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "For paid service options, contact Excel support: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "Warranty",
+    "issueType": "Serial Number Required",
+    "symptoms": ["serial number", "serial required", "সিরিয়াল নম্বর"],
+    "questions": ["Can you find the serial number sticker?", "What product model do you have?"],
+    "solutionSteps": ["Check product back side or bottom sticker.", "Check warranty card or invoice.", "Share serial number with support point."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If serial number is missing, contact Excel support: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "Warranty",
+    "issueType": "Claim Warranty",
+    "symptoms": ["claim warranty", "warranty claim", "claim process", "ওয়ারেন্টি ক্লেইম"],
+    "questions": ["Do you have invoice?", "Do you have serial number?", "What issue does the product have?"],
+    "solutionSteps": ["Take product, invoice, and serial number to support point.", "Explain the issue clearly.", "Support team will inspect and guide next step."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "For warranty claim, contact Excel support: https://www.excelbd.com/support/"
+  }
+]

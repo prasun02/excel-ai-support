@@ -1,0 +1,62 @@
+[
+  {
+    "category": "Printer",
+    "keywords": ["printer offline", "offline printer", "প্রিন্টার অফলাইন"],
+    "solution": {
+      "en": "Check printer power, USB/LAN/WiFi connection, set the printer as default, clear the print queue, and restart both printer and computer.",
+      "bn": "printer power, USB/LAN/WiFi connection check করুন, printer default করুন, print queue clear করুন এবং printer ও computer restart করুন।"
+    },
+    "escalation_message": {
+      "en": "If it remains offline, share printer model and connection type.",
+      "bn": "offline থাকলে printer model এবং connection type লিখুন।"
+    }
+  },
+  {
+    "category": "Printer",
+    "keywords": ["not printing", "print not coming", "blank print", "প্রিন্ট হচ্ছে না"],
+    "solution": {
+      "en": "Confirm paper is loaded, ink/toner is available, the correct printer is selected, and there is no pending error in the printer queue.",
+      "bn": "paper loaded আছে কি না, ink/toner আছে কি না, correct printer select করা হয়েছে কি না এবং queue-তে error আছে কি না দেখুন।"
+    },
+    "escalation_message": {
+      "en": "If it still does not print, share printer model and any error code.",
+      "bn": "তারপরও print না হলে printer model এবং error code লিখুন।"
+    }
+  },
+  {
+    "category": "Printer",
+    "keywords": ["paper jam", "paper stuck", "কাগজ আটকে গেছে", "পেপার জ্যাম"],
+    "solution": {
+      "en": "Turn off the printer, gently remove stuck paper in the paper path, check the tray alignment, and use dry clean paper.",
+      "bn": "printer বন্ধ করুন, paper path থেকে আটকে থাকা কাগজ ধীরে বের করুন, tray alignment check করুন এবং dry clean paper ব্যবহার করুন।"
+    },
+    "escalation_message": {
+      "en": "If paper jams repeatedly, share printer model and where the paper gets stuck.",
+      "bn": "বারবার paper jam হলে printer model এবং কোথায় paper আটকে যায় তা লিখুন।"
+    }
+  },
+  {
+    "category": "Printer",
+    "keywords": ["ink issue", "toner issue", "low ink", "low toner", "cartridge problem", "কালি সমস্যা", "টোনার সমস্যা"],
+    "solution": {
+      "en": "Check ink/toner level, remove and reseat the cartridge, run printer cleaning/calibration, and use compatible genuine supplies.",
+      "bn": "ink/toner level check করুন, cartridge খুলে আবার বসান, printer cleaning/calibration run করুন এবং compatible genuine supplies ব্যবহার করুন।"
+    },
+    "escalation_message": {
+      "en": "If print quality is poor, share printer model and a sample print photo.",
+      "bn": "print quality খারাপ হলে printer model এবং sample print photo দিন।"
+    }
+  },
+  {
+    "category": "Printer",
+    "keywords": ["driver issue", "driver problem", "driver install", "ড্রাইভার সমস্যা"],
+    "solution": {
+      "en": "Download the correct driver for your exact printer model and operating system, install it, restart the computer, and print a test page.",
+      "bn": "exact printer model ও operating system অনুযায়ী driver download করে install করুন, computer restart করুন এবং test page print করুন।"
+    },
+    "escalation_message": {
+      "en": "If driver installation fails, share OS version, printer model, and the error message.",
+      "bn": "driver install না হলে OS version, printer model এবং error message লিখুন।"
+    }
+  }
+]

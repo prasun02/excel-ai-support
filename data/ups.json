@@ -1,0 +1,50 @@
+[
+  {
+    "category": "UPS / Inverter",
+    "keywords": ["no backup", "backup problem", "backup low", "ব্যাকআপ নেই"],
+    "solution": {
+      "en": "Charge the UPS/Inverter fully, reduce connected load, check battery age, and test backup with one low-power device.",
+      "bn": "UPS/Inverter fully charge করুন, connected load কমান, battery age check করুন এবং একটি low-power device দিয়ে backup test করুন।"
+    },
+    "escalation_message": {
+      "en": "If backup is still low, share model, battery age, and connected load details.",
+      "bn": "backup কম থাকলে model, battery age এবং connected load details লিখুন।"
+    }
+  },
+  {
+    "category": "UPS / Inverter",
+    "keywords": ["battery low", "battery problem", "battery replace", "ব্যাটারি লো"],
+    "solution": {
+      "en": "Charge for 6-8 hours, check battery terminals, reduce load, and replace the battery if it is old or swollen.",
+      "bn": "৬-৮ ঘণ্টা charge দিন, battery terminal check করুন, load কমান এবং battery old/swollen হলে replace করুন।"
+    },
+    "escalation_message": {
+      "en": "If battery warning continues, share battery age and UPS/Inverter model.",
+      "bn": "battery warning থাকলে battery age এবং UPS/Inverter model লিখুন।"
+    }
+  },
+  {
+    "category": "UPS / Inverter",
+    "keywords": ["overload", "load problem", "ups alarm", "beeping", "alarm", "ওভারলোড", "এলার্ম"],
+    "solution": {
+      "en": "Remove high-power devices, keep load within rated capacity, restart the UPS, and check if the alarm stops.",
+      "bn": "high-power device খুলে ফেলুন, rated capacity এর মধ্যে load রাখুন, UPS restart করুন এবং alarm বন্ধ হয় কি না দেখুন।"
+    },
+    "escalation_message": {
+      "en": "If alarm continues, share the load list and UPS model.",
+      "bn": "alarm থাকলে connected load list এবং UPS model লিখুন।"
+    }
+  },
+  {
+    "category": "UPS / Inverter",
+    "keywords": ["inverter not charging", "not charging", "charging problem", "চার্জ হচ্ছে না"],
+    "solution": {
+      "en": "Check input voltage, charging cable, battery terminal, fuse, and charger indicator. Keep the inverter connected to stable power.",
+      "bn": "input voltage, charging cable, battery terminal, fuse এবং charger indicator check করুন। inverter stable power-এ connect রাখুন।"
+    },
+    "escalation_message": {
+      "en": "If it still does not charge, share inverter model and battery details.",
+      "bn": "charge না হলে inverter model এবং battery details লিখুন।"
+    }
+  }
+]

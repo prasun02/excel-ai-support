@@ -1,0 +1,132 @@
+[
+  {
+    "keywords": [
+      "slow internet",
+      "buffering",
+      "hanging net",
+      "internet slow",
+      "youtube buffering",
+      "HANG",
+      "ইন্টারনেট স্লো",
+      "নেট স্লো",
+      "নেট ধীর",
+      "ইউটিউব বাফারিং",
+      "বাফারিং",
+      "স্পিড কম"
+    ],
+    "reply": "Please restart your router, turn it off for 30 seconds, reconnect cables, reduce connected devices, and check router placement.\n\nঅনুগ্রহ করে রাউটারটি ৩০ সেকেন্ড বন্ধ রেখে আবার চালু করুন, কেবল সংযোগ পরীক্ষা করুন, সংযুক্ত ডিভাইস কমান এবং রাউটারটি খোলা/উঁচু স্থানে রাখুন।"
+  },
+  {
+    "keywords": [
+      "wifi password",
+      "forgot password",
+      "password problem",
+      "ওয়াইফাই পাসওয়ার্ড",
+      "ওয়াইফাই পাসওয়ার্ড",
+      "পাসওয়ার্ড ভুলে গেছি",
+      "পাসওয়ার্ড সমস্যা",
+      "ওয়াইফাই পাসওয়ার্ড",
+      "ওয়াইফাই পাসওয়ার্ড"
+    ],
+    "reply": "Please login to your router admin panel, open Wireless Settings, and reset your WiFi password.\n\nঅনুগ্রহ করে রাউটার অ্যাডমিন প্যানেলে লগইন করুন, Wireless Settings খুলুন এবং WiFi পাসওয়ার্ড পরিবর্তন করুন।"
+  },
+  {
+    "keywords": [
+      "disconnecting",
+      "wifi disconnect",
+      "internet drops",
+      "connection drop",
+      "নেট কেটে যায়",
+      "নেট কেটে যায়",
+      "ওয়াইফাই ডিসকানেক্ট",
+      "ওয়াইফাই ডিসকানেক্ট",
+      "ইন্টারনেট বন্ধ হয়ে যায়",
+      "ইন্টারনেট বন্ধ হয়ে যায়",
+      "লাইন ড্রপ"
+    ],
+    "reply": "Please restart your router, check cable connection, update firmware, and verify power adapter condition.\n\nরাউটার রিস্টার্ট করুন, কেবল সংযোগ পরীক্ষা করুন, ফার্মওয়্যার আপডেট আছে কি না দেখুন এবং পাওয়ার অ্যাডাপ্টার ঠিক আছে কি না যাচাই করুন।"
+  },
+  {
+    "keywords": [
+      "firmware",
+      "router update",
+      "firmware update",
+      "ফার্মওয়্যার",
+      "ফার্মওয়্যার",
+      "রাউটার আপডেট",
+      "রাউটার সফটওয়্যার",
+      "রাউটার সফটওয়্যার"
+    ],
+    "reply": "Please open the router admin panel, download the correct firmware version, and update carefully without turning off power.\n\nরাউটার অ্যাডমিন প্যানেল খুলুন, সঠিক ফার্মওয়্যার ভার্সন ডাউনলোড করুন এবং আপডেট চলাকালীন পাওয়ার বন্ধ করবেন না।"
+  },
+  {
+    "keywords": [
+      "warranty",
+      "warranty check",
+      "serial number",
+      "ওয়ারেন্টি",
+      "ওয়ারেন্টি",
+      "ওয়ারেন্টি চেক",
+      "ওয়ারেন্টি চেক",
+      "সিরিয়াল নাম্বার",
+      "সিরিয়াল নাম্বার"
+    ],
+    "reply": "Please provide your product serial number to check warranty information.\n\nওয়ারেন্টি তথ্য যাচাই করার জন্য অনুগ্রহ করে আপনার পণ্যের সিরিয়াল নাম্বার দিন।"
+  },
+  {
+    "keywords": [
+      "printer",
+      "printing problem",
+      "print problem",
+      "প্রিন্টার",
+      "প্রিন্ট হচ্ছে না",
+      "প্রিন্ট সমস্যা",
+      "প্রিন্টার সমস্যা"
+    ],
+    "reply": "Please check printer power, cable or WiFi connection, paper tray, ink or toner level, and restart both printer and computer.\n\nপ্রিন্টারের পাওয়ার, কেবল বা WiFi সংযোগ, পেপার ট্রে, ইনক/টোনার এবং প্রিন্টার ও কম্পিউটার রিস্টার্ট করে দেখুন।"
+  },
+  {
+    "keywords": [
+      "camera",
+      "dvr",
+      "nvr",
+      "cctv",
+      "camera offline",
+      "ক্যামেরা",
+      "ডিভিআর",
+      "এনভিআর",
+      "সিসিটিভি",
+      "ক্যামেরা অফলাইন",
+      "ক্যামেরা দেখা যাচ্ছে না"
+    ],
+    "reply": "Please check camera power, LAN cable, DVR/NVR network connection, storage status, and monitor display input.\n\nক্যামেরার পাওয়ার, LAN কেবল, DVR/NVR নেটওয়ার্ক সংযোগ, স্টোরেজ স্ট্যাটাস এবং মনিটরের ইনপুট সোর্স পরীক্ষা করুন।"
+  },
+  {
+    "keywords": [
+      "ups",
+      "inverter",
+      "backup problem",
+      "power backup",
+      "ইউপিএস",
+      "ইনভার্টার",
+      "ব্যাকআপ সমস্যা",
+      "চার্জ থাকছে না",
+      "পাওয়ার ব্যাকআপ",
+      "পাওয়ার ব্যাকআপ"
+    ],
+    "reply": "Please check battery charge, load capacity, input voltage, and whether the connected devices exceed the supported backup load.\n\nব্যাটারির চার্জ, লোড ক্যাপাসিটি, ইনপুট ভোল্টেজ এবং সংযুক্ত ডিভাইসের লোড সাপোর্টেড সীমার মধ্যে আছে কি না পরীক্ষা করুন।"
+  },
+  {
+    "keywords": [
+      "buy product",
+      "purchase",
+      "price",
+      "কিনতে চাই",
+      "পণ্য কিনতে চাই",
+      "দাম",
+      "মূল্য",
+      "প্রাইস"
+    ],
+    "reply": "For product purchase or price information, please contact your nearest Excel sales or support point.\n\nপণ্য কেনা বা দামের তথ্যের জন্য নিকটস্থ Excel sales/support point-এ যোগাযোগ করুন।"
+  }
+]

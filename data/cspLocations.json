@@ -1,0 +1,44 @@
+[
+  {
+    "area": "Dhaka",
+    "keywords": ["dhaka", "mirpur", "uttara", "dhanmondi", "gulshan", "ঢাকা", "মিরপুর", "উত্তরা", "ধানমন্ডি", "গুলশান"],
+    "address": "Excel Technologies Ltd., Dhaka Customer Support Point, Dhaka, Bangladesh",
+    "phone": "+880 9612-222333",
+    "engineerPhone": "+880 1700-000001"
+  },
+  {
+    "area": "Chattogram",
+    "keywords": ["chattogram", "chittagong", "ctg", "চট্টগ্রাম", "চিটাগং"],
+    "address": "Excel Technologies Ltd., Chattogram Customer Support Point, Chattogram, Bangladesh",
+    "phone": "+880 9612-222334",
+    "engineerPhone": "+880 1700-000002"
+  },
+  {
+    "area": "Sylhet",
+    "keywords": ["sylhet", "সিলেট"],
+    "address": "Excel Technologies Ltd., Sylhet Customer Support Point, Sylhet, Bangladesh",
+    "phone": "+880 9612-222335",
+    "engineerPhone": "+880 1700-000003"
+  },
+  {
+    "area": "Rajshahi",
+    "keywords": ["rajshahi", "রাজশাহী"],
+    "address": "Excel Technologies Ltd., Rajshahi Customer Support Point, Rajshahi, Bangladesh",
+    "phone": "+880 9612-222336",
+    "engineerPhone": "+880 1700-000004"
+  },
+  {
+    "area": "Khulna",
+    "keywords": ["khulna", "খুলনা"],
+    "address": "Excel Technologies Ltd., Khulna Customer Support Point, Khulna, Bangladesh",
+    "phone": "+880 9612-222337",
+    "engineerPhone": "+880 1700-000005"
+  },
+  {
+    "area": "Barishal",
+    "keywords": ["barishal", "barisal", "বরিশাল"],
+    "address": "Excel Technologies Ltd., Barishal Customer Support Point, Barishal, Bangladesh",
+    "phone": "+880 9612-222338",
+    "engineerPhone": "+880 1700-000006"
+  }
+]

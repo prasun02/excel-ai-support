@@ -1,0 +1,65 @@
+[
+  {
+    "category": "Router / Internet",
+    "issueType": "Slow Internet",
+    "symptoms": ["slow internet", "buffering", "hanging net", "youtube buffering", "lagging", "internet slow", "নেট স্লো", "ইন্টারনেট স্লো"],
+    "questions": ["Are you using WiFi or LAN?", "Is the issue happening on all devices or only one device?", "How many devices are connected?", "Have you restarted the router?"],
+    "solutionSteps": ["Restart the router and wait 2 minutes.", "Turn off router power for 30 seconds and turn it on again.", "Check if the internet cable is properly connected.", "Place the router in an open area, away from walls and metal objects.", "Reduce connected devices if too many users are connected."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If the issue continues, please contact your nearest Excel Customer Support Point: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "Router / Internet",
+    "issueType": "No Internet",
+    "symptoms": ["no internet", "internet not working", "wan disconnected", "red light", "los light", "নেট নেই", "ইন্টারনেট নেই"],
+    "questions": ["Is the WAN/Internet light on?", "Is your ISP line active?", "Did you restart the router and modem/ONU?"],
+    "solutionSteps": ["Check the WAN/Internet cable.", "Restart the router and ONU/modem.", "Confirm the ISP bill and line status.", "Check whether the WAN/Internet light becomes stable."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If internet is still not working, contact your nearest Excel Customer Support Point: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "Router / Internet",
+    "issueType": "WiFi Disconnecting",
+    "symptoms": ["wifi disconnecting", "wifi drop", "disconnect", "ওয়াইফাই ডিসকানেক্ট"],
+    "questions": ["How far are you from the router?", "Does WiFi disconnect on all devices?", "Is the router placed near walls or metal objects?"],
+    "solutionSteps": ["Restart the router.", "Move the router to an open place.", "Reduce connected devices.", "Change WiFi channel if the router supports it.", "Update router firmware if available."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If WiFi still disconnects, contact Excel support: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "Router / Internet",
+    "issueType": "Weak WiFi Signal",
+    "symptoms": ["weak signal", "low signal", "signal weak", "wifi range", "সিগন্যাল কম"],
+    "questions": ["Where is the router placed?", "How many walls are between you and the router?", "Are you using 2.4GHz or 5GHz WiFi?"],
+    "solutionSteps": ["Place the router in a central open area.", "Keep it away from walls and metal objects.", "Use 2.4GHz for longer range.", "Use an extender or mesh if the area is large."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "For range planning, contact Excel support: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "Router / Internet",
+    "issueType": "Router Setup",
+    "symptoms": ["router setup", "new router setup", "setup router", "রাউটার সেটআপ"],
+    "questions": ["What is your ISP connection type?", "Do you have username/password from ISP?", "Can you open the router admin page?"],
+    "solutionSteps": ["Connect ISP cable to WAN port.", "Open the router admin page.", "Select the correct connection type.", "Enter ISP username/password if needed.", "Set WiFi name and password, then save."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If setup fails, contact Excel support: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "Router / Internet",
+    "issueType": "Firmware Update",
+    "symptoms": ["firmware update", "update firmware", "router update", "ফার্মওয়্যার আপডেট"],
+    "questions": ["What is the router model?", "Do you know the hardware version?", "Is the router power stable?"],
+    "solutionSteps": ["Download firmware only from the official brand website.", "Match exact model and hardware version.", "Keep power stable during update.", "Update from the router admin panel.", "Restart router after update."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If unsure, do not update manually. Contact Excel support: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "Router / Internet",
+    "issueType": "WiFi Password Reset",
+    "symptoms": ["password reset", "wifi password", "forgot password", "পাসওয়ার্ড রিসেট"],
+    "questions": ["Can you log in to the router admin page?", "Do you want to change WiFi password or reset the router?"],
+    "solutionSteps": ["Open router admin page.", "Log in with admin credentials.", "Go to Wireless/WiFi settings.", "Set new WiFi password and save.", "Reconnect devices with the new password."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If password reset fails, contact Excel support: https://www.excelbd.com/support/"
+  }
+]

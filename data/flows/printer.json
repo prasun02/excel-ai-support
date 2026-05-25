@@ -1,0 +1,47 @@
+[
+  {
+    "category": "Printer",
+    "issueType": "Printer Offline",
+    "symptoms": ["printer offline", "offline printer", "প্রিন্টার অফলাইন"],
+    "questions": ["Is the printer powered on?", "Is it connected by USB, LAN, or WiFi?", "Is it set as default printer?"],
+    "solutionSteps": ["Check printer power.", "Check USB/LAN/WiFi connection.", "Set printer as default.", "Clear print queue.", "Restart printer and computer."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If printer remains offline, contact Excel support: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "Printer",
+    "issueType": "Not Printing",
+    "symptoms": ["not printing", "print not coming", "blank print", "প্রিন্ট হচ্ছে না"],
+    "questions": ["Is paper loaded?", "Is ink/toner available?", "Do you see any error code?"],
+    "solutionSteps": ["Load paper correctly.", "Check ink or toner level.", "Select correct printer.", "Clear print queue.", "Print a test page."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If printer still does not print, contact Excel support: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "Printer",
+    "issueType": "Paper Jam",
+    "symptoms": ["paper jam", "paper stuck", "পেপার জ্যাম", "কাগজ আটকে গেছে"],
+    "questions": ["Where is the paper stuck?", "Are you using dry clean paper?", "Does paper jam happen every time?"],
+    "solutionSteps": ["Turn off the printer.", "Gently remove stuck paper.", "Check paper tray alignment.", "Use dry clean paper.", "Restart printer and test."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If paper jam repeats, contact Excel support: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "Printer",
+    "issueType": "Ink/Toner Issue",
+    "symptoms": ["ink issue", "toner issue", "low ink", "low toner", "কালি সমস্যা", "টোনার সমস্যা"],
+    "questions": ["Is ink/toner level low?", "Is the cartridge properly installed?", "Is print quality faded?"],
+    "solutionSteps": ["Check ink/toner level.", "Remove and reinstall cartridge.", "Run cleaning/calibration.", "Use compatible genuine supplies.", "Print a test page."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If quality is still poor, contact Excel support: https://www.excelbd.com/support/"
+  },
+  {
+    "category": "Printer",
+    "issueType": "Driver Issue",
+    "symptoms": ["driver issue", "driver problem", "driver install", "ড্রাইভার সমস্যা"],
+    "questions": ["What is your operating system?", "What is the printer model?", "What error appears during install?"],
+    "solutionSteps": ["Download correct driver for exact model.", "Install as administrator.", "Restart computer.", "Connect printer again.", "Print a test page."],
+    "solvedQuestion": "Did this solve your problem?",
+    "escalationMessage": "If driver install fails, contact Excel support: https://www.excelbd.com/support/"
+  }
+]

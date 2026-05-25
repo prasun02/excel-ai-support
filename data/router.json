@@ -1,0 +1,62 @@
+[
+  {
+    "category": "Router / Internet",
+    "keywords": ["slow internet", "internet slow", "slow speed", "speed slow", "hanging net", "net hang", "buffering", "বাফারিং", "ইন্টারনেট স্লো", "নেট স্লো"],
+    "solution": {
+      "en": "Restart the router for 30 seconds, check the WAN/Internet cable, disconnect extra devices, and keep the router in an open higher place. If speed is still low, test with one device near the router.",
+      "bn": "রাউটার ৩০ সেকেন্ড বন্ধ রেখে আবার চালু করুন, WAN/Internet কেবল ঠিক আছে কি না দেখুন, অতিরিক্ত ডিভাইস disconnect করুন এবং রাউটার খোলা উঁচু জায়গায় রাখুন। তারপরও speed কম থাকলে রাউটারের কাছে একটি ডিভাইস দিয়ে test করুন।"
+    },
+    "escalation_message": {
+      "en": "If the problem remains, share router model, ISP line status, and speed test result.",
+      "bn": "সমস্যা থাকলে router model, ISP line status এবং speed test result লিখুন।"
+    }
+  },
+  {
+    "category": "Router / Internet",
+    "keywords": ["no internet", "internet not working", "wan disconnected", "red light", "los light", "ইন্টারনেট নেই", "নেট নেই", "কাজ করছে না"],
+    "solution": {
+      "en": "Check the WAN cable, restart the router and ONU/modem, confirm your ISP bill/line is active, and check whether the Internet/WAN light becomes stable.",
+      "bn": "WAN cable check করুন, router এবং ONU/modem restart করুন, ISP bill/line active আছে কি না নিশ্চিত করুন এবং Internet/WAN light stable হচ্ছে কি না দেখুন।"
+    },
+    "escalation_message": {
+      "en": "If there is still no internet, share router model, WAN light status, and ISP name.",
+      "bn": "তারপরও internet না থাকলে router model, WAN light status এবং ISP name লিখুন।"
+    }
+  },
+  {
+    "category": "Router / Internet",
+    "keywords": ["wifi disconnecting", "wifi drop", "weak signal", "low signal", "signal weak", "ওয়াইফাই ডিসকানেক্ট", "সিগন্যাল কম"],
+    "solution": {
+      "en": "Place the router away from walls and metal objects, change WiFi channel if available, update firmware, and keep 2.4GHz for longer range and 5GHz for higher speed nearby.",
+      "bn": "রাউটার দেয়াল ও metal object থেকে দূরে রাখুন, সম্ভব হলে WiFi channel change করুন, firmware update করুন। বেশি range দরকার হলে 2.4GHz এবং কাছে high speed দরকার হলে 5GHz ব্যবহার করুন।"
+    },
+    "escalation_message": {
+      "en": "If WiFi still drops, share router model, distance from router, and how many devices are connected.",
+      "bn": "WiFi disconnect হলে router model, router থেকে distance এবং connected device সংখ্যা লিখুন।"
+    }
+  },
+  {
+    "category": "Router / Internet",
+    "keywords": ["firmware update", "update firmware", "router update", "ফার্মওয়্যার আপডেট"],
+    "solution": {
+      "en": "Download firmware only from the official brand website, confirm the exact router model and hardware version, keep power stable, then update from the router admin panel.",
+      "bn": "শুধু official brand website থেকে firmware download করুন, exact router model ও hardware version মিলিয়ে নিন, power stable রাখুন, তারপর router admin panel থেকে update করুন।"
+    },
+    "escalation_message": {
+      "en": "If you are unsure, do not update manually. Share the router model and current firmware version.",
+      "bn": "নিশ্চিত না হলে নিজে update করবেন না। router model এবং current firmware version লিখুন।"
+    }
+  },
+  {
+    "category": "Router / Internet",
+    "keywords": ["password reset", "wifi password", "forgot password", "router setup", "new router setup", "পাসওয়ার্ড রিসেট", "রাউটার সেটআপ"],
+    "solution": {
+      "en": "Open the router admin page, log in with the admin username/password, update WiFi name/password, save settings, and reconnect your devices. For full reset, press reset for 8-10 seconds and set up again.",
+      "bn": "router admin page খুলে admin username/password দিয়ে login করুন, WiFi name/password update করে save করুন এবং device আবার connect করুন। full reset দরকার হলে reset button ৮-১০ সেকেন্ড চাপুন এবং আবার setup করুন।"
+    },
+    "escalation_message": {
+      "en": "If setup fails, share router model, ISP connection type, and any error message.",
+      "bn": "setup না হলে router model, ISP connection type এবং error message লিখুন।"
+    }
+  }
+]

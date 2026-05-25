@@ -1,0 +1,38 @@
+[
+  {
+    "category": "Warranty",
+    "keywords": ["warranty check", "check warranty", "serial number", "warranty status", "ওয়ারেন্টি চেক", "সিরিয়াল নম্বর"],
+    "solution": {
+      "en": "Please keep product serial number, model, purchase date, and invoice ready. Warranty status needs to be checked from official support records.",
+      "bn": "product serial number, model, purchase date এবং invoice প্রস্তুত রাখুন। warranty status official support record থেকে check করতে হবে।"
+    },
+    "escalation_message": {
+      "en": "Contact your nearest Excel Customer Support Point with the serial number and invoice.",
+      "bn": "serial number এবং invoice নিয়ে nearest Excel Customer Support Point-এ যোগাযোগ করুন।"
+    }
+  },
+  {
+    "category": "Warranty",
+    "keywords": ["warranty expired", "expired warranty", "warranty over", "ওয়ারেন্টি শেষ"],
+    "solution": {
+      "en": "If warranty is expired, paid service may be available after inspection by the support point.",
+      "bn": "warranty শেষ হলে support point inspection করার পর paid service পাওয়া যেতে পারে।"
+    },
+    "escalation_message": {
+      "en": "Visit the support link and contact the nearest CSP for service options.",
+      "bn": "support link থেকে nearest CSP-তে service option জানুন।"
+    }
+  },
+  {
+    "category": "Warranty",
+    "keywords": ["claim warranty", "warranty claim", "claim process", "ওয়ারেন্টি ক্লেইম"],
+    "solution": {
+      "en": "For warranty claim, take the product, invoice, serial number, and problem details to the nearest support point.",
+      "bn": "warranty claim করতে product, invoice, serial number এবং problem details নিয়ে nearest support point-এ যান।"
+    },
+    "escalation_message": {
+      "en": "The support point will inspect the product and guide the next step.",
+      "bn": "support point product inspect করে পরবর্তী step জানাবে।"
+    }
+  }
+]

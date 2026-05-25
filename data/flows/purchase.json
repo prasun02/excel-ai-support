@@ -1,0 +1,47 @@
+[
+  {
+    "category": "New Product Purchase",
+    "issueType": "Product Purchase",
+    "symptoms": ["buy product", "purchase product", "new product", "want to buy", "product purchase", "নতুন পণ্য", "পণ্য কিনতে চাই", "প্রোডাক্ট কিনতে চাই"],
+    "questions": ["For product purchase support, please mention your desired location."],
+    "solutionSteps": ["Thank you. Our sales team can contact you based on your location. Please share your phone number or contact your nearest Excel sales point."],
+    "solvedQuestion": "Do you need any other service?",
+    "escalationMessage": "For sales support, please contact your nearest Excel sales point."
+  },
+  {
+    "category": "New Product Purchase",
+    "issueType": "Dealer Contact",
+    "symptoms": ["dealer contact", "dealer location", "dealer", "ডিলার"],
+    "questions": ["Please mention your desired location."],
+    "solutionSteps": ["Thank you. Our sales team can contact you based on your location. Please share your phone number or contact your nearest Excel sales point."],
+    "solvedQuestion": "Do you need any other service?",
+    "escalationMessage": "For dealer support, please contact your nearest Excel sales point."
+  },
+  {
+    "category": "New Product Purchase",
+    "issueType": "Sales Contact",
+    "symptoms": ["sales contact", "contact sales", "sales person"],
+    "questions": ["Please mention your desired location."],
+    "solutionSteps": ["Thank you. Our sales team can contact you based on your location. Please share your phone number or contact your nearest Excel sales point."],
+    "solvedQuestion": "Do you need any other service?",
+    "escalationMessage": "For sales contact, please share your location and phone number."
+  },
+  {
+    "category": "New Product Purchase",
+    "issueType": "Price Inquiry",
+    "symptoms": ["product price", "price inquiry", "price", "দাম"],
+    "questions": ["Which product are you interested in?", "Please mention your desired location."],
+    "solutionSteps": ["Product price may vary by model and availability.", "Please share product name and location.", "Our sales team can guide you with price and availability."],
+    "solvedQuestion": "Do you need any other service?",
+    "escalationMessage": "For price support, contact your nearest Excel sales point."
+  },
+  {
+    "category": "New Product Purchase",
+    "issueType": "Location Based Sales Contact",
+    "symptoms": ["dhaka", "chattogram", "barisal", "khulna", "rajshahi", "sylhet", "rangpur", "mymensingh", "ঢাকা", "চট্টগ্রাম", "বরিশাল", "খুলনা"],
+    "questions": ["Please share your phone number so the sales team can contact you."],
+    "solutionSteps": ["Thank you. Our sales team can contact you based on your location. Please share your phone number or contact your nearest Excel sales point."],
+    "solvedQuestion": "Do you need any other service?",
+    "escalationMessage": "For sales support, please contact your nearest Excel sales point."
+  }
+]
