@@ -1,5 +1,4 @@
 'use client';
-<<<<<<< HEAD
 
 import Image from 'next/image';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
@@ -15,7 +14,12 @@ import {
   FaTools,
   FaWifi,
 } from 'react-icons/fa';
-import { analyzeSupportMessage, nonSupportReply } from '@/lib/languageUnderstanding';
+import {
+  analyzeSupportMessage,
+  escalationLocationReply,
+  isHumanHelpRequest,
+  nonSupportReply,
+} from '@/lib/languageUnderstanding';
 import {
   appendMessagesToTicket,
   clearActiveTicket,
@@ -68,7 +72,7 @@ const categories: SupportCategory[] = [
   {
     icon: FaHeadset,
     label: 'New Product Purchase',
-    banglaLabel: 'নতুন পণ্য ক্রয়',
+    banglaLabel: 'Ã Â¦Â¨Ã Â¦Â¤Ã Â§ÂÃ Â¦Â¨ Ã Â¦ÂªÃ Â¦Â£Ã Â§ÂÃ Â¦Â¯ Ã Â¦â€¢Ã Â§ÂÃ Â¦Â°Ã Â§Å¸',
     value: 'New Product Purchase',
   },
   { icon: FaHeadset, label: 'Other Product', value: 'General' },
@@ -185,7 +189,7 @@ function getCategoryFromMessage(message: string) {
 
 function categoryChoicePrompt(language: ReplyLanguage) {
   return language === 'bn'
-    ? 'অনুগ্রহ করে একটি সার্ভিস ক্যাটাগরি নির্বাচন করুন।'
+    ? 'Ã Â¦â€¦Ã Â¦Â¨Ã Â§ÂÃ Â¦â€”Ã Â§ÂÃ Â¦Â°Ã Â¦Â¹ Ã Â¦â€¢Ã Â¦Â°Ã Â§â€¡ Ã Â¦ÂÃ Â¦â€¢Ã Â¦Å¸Ã Â¦Â¿ Ã Â¦Â¸Ã Â¦Â¾Ã Â¦Â°Ã Â§ÂÃ Â¦Â­Ã Â¦Â¿Ã Â¦Â¸ Ã Â¦â€¢Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¾Ã Â¦Å¸Ã Â¦Â¾Ã Â¦â€”Ã Â¦Â°Ã Â¦Â¿ Ã Â¦Â¨Ã Â¦Â¿Ã Â¦Â°Ã Â§ÂÃ Â¦Â¬Ã Â¦Â¾Ã Â¦Å¡Ã Â¦Â¨ Ã Â¦â€¢Ã Â¦Â°Ã Â§ÂÃ Â¦Â¨Ã Â¥Â¤'
     : 'Please select a service category.';
 }
 
@@ -203,19 +207,19 @@ function shouldShowCategoryChoices(message: SupportChatMessage) {
 function categorySelectedMessage(category: string, language: ReplyLanguage) {
   const selectedText =
     language === 'bn'
-      ? `আপনি ${category} ক্যাটাগরি নির্বাচন করেছেন।`
+      ? `Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¿ ${category} Ã Â¦â€¢Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¾Ã Â¦Å¸Ã Â¦Â¾Ã Â¦â€”Ã Â¦Â°Ã Â¦Â¿ Ã Â¦Â¨Ã Â¦Â¿Ã Â¦Â°Ã Â§ÂÃ Â¦Â¬Ã Â¦Â¾Ã Â¦Å¡Ã Â¦Â¨ Ã Â¦â€¢Ã Â¦Â°Ã Â§â€¡Ã Â¦â€ºÃ Â§â€¡Ã Â¦Â¨Ã Â¥Â¤`
       : `You selected ${category}.`;
 
   return `${selectedText}\n\n${
     language === 'bn'
-      ? 'অনুগ্রহ করে এখন আপনার সমস্যাটি লিখুন বা বলুন।'
+      ? 'Ã Â¦â€¦Ã Â¦Â¨Ã Â§ÂÃ Â¦â€”Ã Â§ÂÃ Â¦Â°Ã Â¦Â¹ Ã Â¦â€¢Ã Â¦Â°Ã Â§â€¡ Ã Â¦ÂÃ Â¦â€“Ã Â¦Â¨ Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦Â° Ã Â¦Â¸Ã Â¦Â®Ã Â¦Â¸Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¾Ã Â¦Å¸Ã Â¦Â¿ Ã Â¦Â²Ã Â¦Â¿Ã Â¦â€“Ã Â§ÂÃ Â¦Â¨ Ã Â¦Â¬Ã Â¦Â¾ Ã Â¦Â¬Ã Â¦Â²Ã Â§ÂÃ Â¦Â¨Ã Â¥Â¤'
       : 'Please write or tell your issue now.'
   }`;
 }
 
 function purchaseSetupMessage(language: ReplyLanguage) {
   return language === 'bn'
-    ? 'পণ্য ক্রয়ের জন্য অনুগ্রহ করে আপনার কাঙ্ক্ষিত লোকেশন লিখুন। এরপর আমরা আপনাকে সংশ্লিষ্ট সেলস কন্টাক্ট পারসনের সাথে সংযুক্ত করতে সহায়তা করব।'
+    ? 'Ã Â¦ÂªÃ Â¦Â£Ã Â§ÂÃ Â¦Â¯ Ã Â¦â€¢Ã Â§ÂÃ Â¦Â°Ã Â§Å¸Ã Â§â€¡Ã Â¦Â° Ã Â¦Å“Ã Â¦Â¨Ã Â§ÂÃ Â¦Â¯ Ã Â¦â€¦Ã Â¦Â¨Ã Â§ÂÃ Â¦â€”Ã Â§ÂÃ Â¦Â°Ã Â¦Â¹ Ã Â¦â€¢Ã Â¦Â°Ã Â§â€¡ Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦Â° Ã Â¦â€¢Ã Â¦Â¾Ã Â¦â„¢Ã Â§ÂÃ Â¦â€¢Ã Â§ÂÃ Â¦Â·Ã Â¦Â¿Ã Â¦Â¤ Ã Â¦Â²Ã Â§â€¹Ã Â¦â€¢Ã Â§â€¡Ã Â¦Â¶Ã Â¦Â¨ Ã Â¦Â²Ã Â¦Â¿Ã Â¦â€“Ã Â§ÂÃ Â¦Â¨Ã Â¥Â¤ Ã Â¦ÂÃ Â¦Â°Ã Â¦ÂªÃ Â¦Â° Ã Â¦â€ Ã Â¦Â®Ã Â¦Â°Ã Â¦Â¾ Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦â€¢Ã Â§â€¡ Ã Â¦Â¸Ã Â¦â€šÃ Â¦Â¶Ã Â§ÂÃ Â¦Â²Ã Â¦Â¿Ã Â¦Â·Ã Â§ÂÃ Â¦Å¸ Ã Â¦Â¸Ã Â§â€¡Ã Â¦Â²Ã Â¦Â¸ Ã Â¦â€¢Ã Â¦Â¨Ã Â§ÂÃ Â¦Å¸Ã Â¦Â¾Ã Â¦â€¢Ã Â§ÂÃ Â¦Å¸ Ã Â¦ÂªÃ Â¦Â¾Ã Â¦Â°Ã Â¦Â¸Ã Â¦Â¨Ã Â§â€¡Ã Â¦Â° Ã Â¦Â¸Ã Â¦Â¾Ã Â¦Â¥Ã Â§â€¡ Ã Â¦Â¸Ã Â¦â€šÃ Â¦Â¯Ã Â§ÂÃ Â¦â€¢Ã Â§ÂÃ Â¦Â¤ Ã Â¦â€¢Ã Â¦Â°Ã Â¦Â¤Ã Â§â€¡ Ã Â¦Â¸Ã Â¦Â¹Ã Â¦Â¾Ã Â§Å¸Ã Â¦Â¤Ã Â¦Â¾ Ã Â¦â€¢Ã Â¦Â°Ã Â¦Â¬Ã Â¥Â¤'
     : 'For product purchase support, please mention your desired location. Then we can help connect you with the appropriate sales contact person.';
 }
 
@@ -298,11 +302,11 @@ function WelcomeCard({ isDarkMode }: { isDarkMode: boolean }) {
           Welcome to Excel AI Smart Support
         </h2>
         <p className={`mt-2 text-lg ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
-          এক্সেল এআই স্মার্ট সাপোর্টে স্বাগতম
+          Ã Â¦ÂÃ Â¦â€¢Ã Â§ÂÃ Â¦Â¸Ã Â§â€¡Ã Â¦Â² Ã Â¦ÂÃ Â¦â€ Ã Â¦â€¡ Ã Â¦Â¸Ã Â§ÂÃ Â¦Â®Ã Â¦Â¾Ã Â¦Â°Ã Â§ÂÃ Â¦Å¸ Ã Â¦Â¸Ã Â¦Â¾Ã Â¦ÂªÃ Â§â€¹Ã Â¦Â°Ã Â§ÂÃ Â¦Å¸Ã Â§â€¡ Ã Â¦Â¸Ã Â§ÂÃ Â¦Â¬Ã Â¦Â¾Ã Â¦â€”Ã Â¦Â¤Ã Â¦Â®
         </p>
         <div className={`mx-auto mt-5 max-w-xl space-y-2 text-sm leading-6 sm:text-base ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
           <p>Select a service category or type your problem to begin.</p>
-          <p>সাপোর্ট শুরু করতে একটি ক্যাটাগরি নির্বাচন করুন অথবা আপনার সমস্যা লিখুন।</p>
+          <p>Ã Â¦Â¸Ã Â¦Â¾Ã Â¦ÂªÃ Â§â€¹Ã Â¦Â°Ã Â§ÂÃ Â¦Å¸ Ã Â¦Â¶Ã Â§ÂÃ Â¦Â°Ã Â§Â Ã Â¦â€¢Ã Â¦Â°Ã Â¦Â¤Ã Â§â€¡ Ã Â¦ÂÃ Â¦â€¢Ã Â¦Å¸Ã Â¦Â¿ Ã Â¦â€¢Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¾Ã Â¦Å¸Ã Â¦Â¾Ã Â¦â€”Ã Â¦Â°Ã Â¦Â¿ Ã Â¦Â¨Ã Â¦Â¿Ã Â¦Â°Ã Â§ÂÃ Â¦Â¬Ã Â¦Â¾Ã Â¦Å¡Ã Â¦Â¨ Ã Â¦â€¢Ã Â¦Â°Ã Â§ÂÃ Â¦Â¨ Ã Â¦â€¦Ã Â¦Â¥Ã Â¦Â¬Ã Â¦Â¾ Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦Â° Ã Â¦Â¸Ã Â¦Â®Ã Â¦Â¸Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¾ Ã Â¦Â²Ã Â¦Â¿Ã Â¦â€“Ã Â§ÂÃ Â¦Â¨Ã Â¥Â¤</p>
         </div>
         <div className={`mx-auto mt-6 inline-flex rounded-lg border px-4 py-2 text-sm ${isDarkMode ? 'border-slate-700 bg-[#172033] text-slate-300' : 'border-blue-100 bg-blue-50 text-blue-800'}`}>
           The system will reply in the language you use.
@@ -575,6 +579,20 @@ export default function ChatPage() {
         const shortcutCategory = getCategoryFromShortcut(trimmedContent);
         const detectedCategory = shortcutCategory || getCategoryFromMessage(trimmedContent);
 
+        if (isHumanHelpRequest(trimmedContent)) {
+          const assistantMessage = makeMessage('assistant', escalationLocationReply(language));
+          const saved = appendMessagesToTicket(workingTicket, [userMessage, assistantMessage], {
+            customerName: requesterName,
+            customerContact: requesterContact,
+            solvedStatus: 'not_solved',
+          });
+
+          setTicketState(saved.ticket, saved.tickets);
+          setMessages([...messages, userMessage, assistantMessage]);
+          setAwaitingCategorySelection(false);
+          return;
+        }
+
         if (analysis.isNonSupport || (!analysis.isSupportRelated && !detectedCategory)) {
           const assistantMessage = makeMessage('assistant', nonSupportReply(language));
           const saved = appendMessagesToTicket(workingTicket, [userMessage, assistantMessage], {
@@ -648,7 +666,7 @@ export default function ChatPage() {
         makeMessage(
           'assistant',
           hasBangla(trimmedContent)
-            ? 'দুঃখিত, support service সাময়িকভাবে unavailable. একটু পরে আবার চেষ্টা করুন।'
+            ? 'Ã Â¦Â¦Ã Â§ÂÃ Â¦Æ’Ã Â¦â€“Ã Â¦Â¿Ã Â¦Â¤, support service Ã Â¦Â¸Ã Â¦Â¾Ã Â¦Â®Ã Â§Å¸Ã Â¦Â¿Ã Â¦â€¢Ã Â¦Â­Ã Â¦Â¾Ã Â¦Â¬Ã Â§â€¡ unavailable. Ã Â¦ÂÃ Â¦â€¢Ã Â¦Å¸Ã Â§Â Ã Â¦ÂªÃ Â¦Â°Ã Â§â€¡ Ã Â¦â€ Ã Â¦Â¬Ã Â¦Â¾Ã Â¦Â° Ã Â¦Å¡Ã Â§â€¡Ã Â¦Â·Ã Â§ÂÃ Â¦Å¸Ã Â¦Â¾ Ã Â¦â€¢Ã Â¦Â°Ã Â§ÂÃ Â¦Â¨Ã Â¥Â¤'
             : 'Sorry, support is temporarily unavailable. Please try again in a moment.'
         ),
       ]);
@@ -1041,209 +1059,3 @@ export default function ChatPage() {
 }
 
 
-=======
-
-import { useEffect, useRef, useState } from 'react';
-import { FaMicrophone, FaWifi } from 'react-icons/fa';
-
-export default function ChatPage() {
-  const [messages, setMessages] = useState<any[]>([]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: 'smooth',
-    });
-  }, [messages]);
-
-  async function sendMessage(
-    e: React.FormEvent
-  ) {
-    e.preventDefault();
-
-    if (!input.trim()) return;
-
-    const userMessage = {
-      role: 'user',
-      content: input,
-    };
-
-    const updatedMessages = [
-      ...messages,
-      userMessage,
-    ];
-
-    setMessages(updatedMessages);
-
-    setInput('');
-
-    setLoading(true);
-
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-
-        headers: {
-          'Content-Type': 'application/json',
-        },
-
-        body: JSON.stringify({
-          messages: updatedMessages,
-        }),
-      });
-
-      const data = await res.json();
-
-      setMessages([
-        ...updatedMessages,
-        {
-          role: 'assistant',
-          content: data.content,
-        },
-      ]);
-    } catch (error) {
-      console.error(error);
-    }
-
-    setLoading(false);
-  }
-
-  function startVoiceInput() {
-    const SpeechRecognition: any =
-      (window as any).SpeechRecognition ||
-      (window as any).webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-      alert(
-        'Voice recognition not supported'
-      );
-
-      return;
-    }
-
-    const recognition =
-      new SpeechRecognition();
-
-    recognition.lang = 'bn-BD';
-
-    recognition.start();
-
-    recognition.onresult = (
-      event: any
-    ) => {
-      const transcript =
-        event.results[0][0].transcript;
-
-      setInput(transcript);
-    };
-  }
-
-  return (
-    <main className="flex flex-col h-screen bg-gradient-to-br from-blue-100 to-gray-100">
-
-      {/* Header */}
-      <div className="bg-blue-700 text-white p-5 shadow-xl flex items-center gap-3">
-
-        <div className="bg-white text-blue-700 p-3 rounded-full">
-          <FaWifi size={24} />
-        </div>
-
-        <div>
-          <h1 className="text-2xl font-bold">
-            Excel AI Smart Support
-          </h1>
-
-          <p className="text-sm opacity-90">
-            AI-powered customer support assistant
-          </p>
-        </div>
-
-      </div>
-
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-5 space-y-4">
-
-        {messages.length === 0 && (
-          <div className="text-center text-gray-500 mt-20">
-
-            <h2 className="text-2xl font-semibold mb-3">
-              Welcome to Excel AI Support
-            </h2>
-
-            <p>
-              Ask any router, internet, or WiFi problem.
-            </p>
-
-            <p className="mt-2 text-sm">
-              বাংলা এবং English দুই ভাষাতেই প্রশ্ন করতে পারবেন।
-            </p>
-
-          </div>
-        )}
-
-        {messages.map((message, index) => (
-
-          <div
-            key={index}
-            className={`max-w-2xl p-4 rounded-2xl shadow-lg transition-all duration-300 ${
-              message.role === 'user'
-                ? 'bg-blue-600 text-white ml-auto'
-                : 'bg-white text-black'
-            }`}
-          >
-            {message.content}
-          </div>
-
-        ))}
-
-        {loading && (
-          <div className="bg-white p-4 rounded-2xl shadow-lg max-w-xs animate-pulse">
-            AI is typing...
-          </div>
-        )}
-
-        <div ref={messagesEndRef} />
-
-      </div>
-
-      {/* Input */}
-      <form
-        onSubmit={sendMessage}
-        className="p-4 bg-white border-t flex gap-2"
-      >
-
-        <input
-          value={input}
-          onChange={(e) =>
-            setInput(e.target.value)
-          }
-          placeholder="Describe your problem..."
-          className="flex-1 border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500"
-        />
-
-        {/* Voice */}
-        <button
-          type="button"
-          onClick={startVoiceInput}
-          className="bg-gray-200 hover:bg-gray-300 px-4 rounded-xl"
-        >
-          <FaMicrophone />
-        </button>
-
-        {/* Send */}
-        <button
-          type="submit"
-          className="bg-blue-700 hover:bg-blue-800 text-white px-6 rounded-xl"
-        >
-          Send
-        </button>
-
-      </form>
-
-    </main>
-  );
-}
->>>>>>> fa8cc45 (Excel AI chatbot upgraded)

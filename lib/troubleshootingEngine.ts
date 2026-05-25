@@ -325,6 +325,23 @@ export function getNextTroubleshootingResponse(input: TroubleshootingInput): Tro
   const analysis = analyzeSupportMessage(input.message);
   const selectedCategory = categoryFromContext(input.ticketState, input.selectedCategory) || analysis.category;
 
+  if (isHumanHelpRequest(input.message)) {
+    const knownCategory = categoryFromContext(input.ticketState, input.selectedCategory);
+
+    return {
+      responseText: escalationLocationReply(language),
+      updatedTicketState: {
+        ...input.ticketState,
+        solvedStatus: 'not_solved',
+      },
+      detectedCategory: knownCategory,
+      detectedIssueType: input.ticketState?.issueType || analysis.issueType,
+      needsCategorySelection: false,
+      matched: false,
+      language,
+    };
+  }
+
   if (!selectedCategory) {
     if (analysis.isNonSupport || !analysis.isSupportRelated) {
       return {
