@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 const notoSansBengali = Noto_Sans_Bengali({
-  variable: "--font-noto-sans-bengali",
+  variable: "--font-noto-bengali",
   subsets: ["bengali"],
   weight: ["400", "500", "600", "700"],
 });

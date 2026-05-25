@@ -1,4 +1,5 @@
 import supportIntents from '@/data/supportIntents.json';
+import { bn } from '@/lib/i18n';
 import type { ReplyLanguage, SupportIntentItem } from '@/types/support';
 import { detectLanguage, normalizeText } from '@/utils/text';
 
@@ -256,7 +257,7 @@ export function noExactSolutionReply(language: ReplyLanguage) {
 
 export function escalationLocationReply(language: ReplyLanguage) {
   return language === 'bn'
-    ? 'দুঃখিত। অনুগ্রহ করে আপনার লোকেশন লিখুন, তাহলে আমরা আপনাকে নিকটস্থ Excel Customer Support Point-এর তথ্য দিতে সহায়তা করব। আপনি চাইলে এখানে দেখতে পারেন: https://www.excelbd.com/support/'
+    ? bn.escalationLocation
     : 'Sorry to hear that. Please provide your location so we can guide you to the nearest Excel Customer Support Point. You may also visit: https://www.excelbd.com/support/';
 }
 
