@@ -73,7 +73,7 @@ const categories: SupportCategory[] = [
   {
     icon: FaHeadset,
     label: 'New Product Purchase',
-    banglaLabel: 'Ã Â¦Â¨Ã Â¦Â¤Ã Â§ÂÃ Â¦Â¨ Ã Â¦ÂªÃ Â¦Â£Ã Â§ÂÃ Â¦Â¯ Ã Â¦â€¢Ã Â§ÂÃ Â¦Â°Ã Â§Å¸',
+    banglaLabel: 'নতুন পণ্য ক্রয়',
     value: 'New Product Purchase',
   },
   { icon: FaHeadset, label: 'Other Product', value: 'General' },
@@ -190,7 +190,7 @@ function getCategoryFromMessage(message: string) {
 
 function categoryChoicePrompt(language: ReplyLanguage) {
   return language === 'bn'
-    ? 'Ã Â¦â€¦Ã Â¦Â¨Ã Â§ÂÃ Â¦â€”Ã Â§ÂÃ Â¦Â°Ã Â¦Â¹ Ã Â¦â€¢Ã Â¦Â°Ã Â§â€¡ Ã Â¦ÂÃ Â¦â€¢Ã Â¦Å¸Ã Â¦Â¿ Ã Â¦Â¸Ã Â¦Â¾Ã Â¦Â°Ã Â§ÂÃ Â¦Â­Ã Â¦Â¿Ã Â¦Â¸ Ã Â¦â€¢Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¾Ã Â¦Å¸Ã Â¦Â¾Ã Â¦â€”Ã Â¦Â°Ã Â¦Â¿ Ã Â¦Â¨Ã Â¦Â¿Ã Â¦Â°Ã Â§ÂÃ Â¦Â¬Ã Â¦Â¾Ã Â¦Å¡Ã Â¦Â¨ Ã Â¦â€¢Ã Â¦Â°Ã Â§ÂÃ Â¦Â¨Ã Â¥Â¤'
+    ? 'অনুগ্রহ করে একটি সার্ভিস ক্যাটাগরি নির্বাচন করুন।'
     : 'Please select a service category.';
 }
 
@@ -208,19 +208,19 @@ function shouldShowCategoryChoices(message: SupportChatMessage) {
 function categorySelectedMessage(category: string, language: ReplyLanguage) {
   const selectedText =
     language === 'bn'
-      ? `Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¿ ${category} Ã Â¦â€¢Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¾Ã Â¦Å¸Ã Â¦Â¾Ã Â¦â€”Ã Â¦Â°Ã Â¦Â¿ Ã Â¦Â¨Ã Â¦Â¿Ã Â¦Â°Ã Â§ÂÃ Â¦Â¬Ã Â¦Â¾Ã Â¦Å¡Ã Â¦Â¨ Ã Â¦â€¢Ã Â¦Â°Ã Â§â€¡Ã Â¦â€ºÃ Â§â€¡Ã Â¦Â¨Ã Â¥Â¤`
+      ? `আপনি ${category} ক্যাটাগরি নির্বাচন করেছেন।`
       : `You selected ${category}.`;
 
   return `${selectedText}\n\n${
     language === 'bn'
-      ? 'Ã Â¦â€¦Ã Â¦Â¨Ã Â§ÂÃ Â¦â€”Ã Â§ÂÃ Â¦Â°Ã Â¦Â¹ Ã Â¦â€¢Ã Â¦Â°Ã Â§â€¡ Ã Â¦ÂÃ Â¦â€“Ã Â¦Â¨ Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦Â° Ã Â¦Â¸Ã Â¦Â®Ã Â¦Â¸Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¾Ã Â¦Å¸Ã Â¦Â¿ Ã Â¦Â²Ã Â¦Â¿Ã Â¦â€“Ã Â§ÂÃ Â¦Â¨ Ã Â¦Â¬Ã Â¦Â¾ Ã Â¦Â¬Ã Â¦Â²Ã Â§ÂÃ Â¦Â¨Ã Â¥Â¤'
+      ? 'অনুগ্রহ করে এখন আপনার সমস্যাটি লিখুন বা বলুন।'
       : 'Please write or tell your issue now.'
   }`;
 }
 
 function purchaseSetupMessage(language: ReplyLanguage) {
   return language === 'bn'
-    ? 'Ã Â¦ÂªÃ Â¦Â£Ã Â§ÂÃ Â¦Â¯ Ã Â¦â€¢Ã Â§ÂÃ Â¦Â°Ã Â§Å¸Ã Â§â€¡Ã Â¦Â° Ã Â¦Å“Ã Â¦Â¨Ã Â§ÂÃ Â¦Â¯ Ã Â¦â€¦Ã Â¦Â¨Ã Â§ÂÃ Â¦â€”Ã Â§ÂÃ Â¦Â°Ã Â¦Â¹ Ã Â¦â€¢Ã Â¦Â°Ã Â§â€¡ Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦Â° Ã Â¦â€¢Ã Â¦Â¾Ã Â¦â„¢Ã Â§ÂÃ Â¦â€¢Ã Â§ÂÃ Â¦Â·Ã Â¦Â¿Ã Â¦Â¤ Ã Â¦Â²Ã Â§â€¹Ã Â¦â€¢Ã Â§â€¡Ã Â¦Â¶Ã Â¦Â¨ Ã Â¦Â²Ã Â¦Â¿Ã Â¦â€“Ã Â§ÂÃ Â¦Â¨Ã Â¥Â¤ Ã Â¦ÂÃ Â¦Â°Ã Â¦ÂªÃ Â¦Â° Ã Â¦â€ Ã Â¦Â®Ã Â¦Â°Ã Â¦Â¾ Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦â€¢Ã Â§â€¡ Ã Â¦Â¸Ã Â¦â€šÃ Â¦Â¶Ã Â§ÂÃ Â¦Â²Ã Â¦Â¿Ã Â¦Â·Ã Â§ÂÃ Â¦Å¸ Ã Â¦Â¸Ã Â§â€¡Ã Â¦Â²Ã Â¦Â¸ Ã Â¦â€¢Ã Â¦Â¨Ã Â§ÂÃ Â¦Å¸Ã Â¦Â¾Ã Â¦â€¢Ã Â§ÂÃ Â¦Å¸ Ã Â¦ÂªÃ Â¦Â¾Ã Â¦Â°Ã Â¦Â¸Ã Â¦Â¨Ã Â§â€¡Ã Â¦Â° Ã Â¦Â¸Ã Â¦Â¾Ã Â¦Â¥Ã Â§â€¡ Ã Â¦Â¸Ã Â¦â€šÃ Â¦Â¯Ã Â§ÂÃ Â¦â€¢Ã Â§ÂÃ Â¦Â¤ Ã Â¦â€¢Ã Â¦Â°Ã Â¦Â¤Ã Â§â€¡ Ã Â¦Â¸Ã Â¦Â¹Ã Â¦Â¾Ã Â§Å¸Ã Â¦Â¤Ã Â¦Â¾ Ã Â¦â€¢Ã Â¦Â°Ã Â¦Â¬Ã Â¥Â¤'
+    ? 'পণ্য ক্রয়ের জন্য অনুগ্রহ করে আপনার কাঙ্ক্ষিত লোকেশন লিখুন। এরপর আমরা আপনাকে সংশ্লিষ্ট সেলস কন্টাক্ট পারসনের সাথে সংযুক্ত করতে সহায়তা করব।'
     : 'For product purchase support, please mention your desired location. Then we can help connect you with the appropriate sales contact person.';
 }
 
@@ -330,15 +330,16 @@ function WelcomeCard({ isDarkMode }: { isDarkMode: boolean }) {
         <h2 className="mt-5 text-2xl font-semibold tracking-normal sm:text-3xl">
           Welcome to Excel AI Smart Support
         </h2>
-        <p className={`mt-2 text-lg ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
-          Ã Â¦ÂÃ Â¦â€¢Ã Â§ÂÃ Â¦Â¸Ã Â§â€¡Ã Â¦Â² Ã Â¦ÂÃ Â¦â€ Ã Â¦â€¡ Ã Â¦Â¸Ã Â§ÂÃ Â¦Â®Ã Â¦Â¾Ã Â¦Â°Ã Â§ÂÃ Â¦Å¸ Ã Â¦Â¸Ã Â¦Â¾Ã Â¦ÂªÃ Â§â€¹Ã Â¦Â°Ã Â§ÂÃ Â¦Å¸Ã Â§â€¡ Ã Â¦Â¸Ã Â§ÂÃ Â¦Â¬Ã Â¦Â¾Ã Â¦â€”Ã Â¦Â¤Ã Â¦Â®
+        <p lang="bn" className={`mt-2 text-lg bangla-text ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+          এক্সেল এআই স্মার্ট সাপোর্টে স্বাগতম।
         </p>
         <div className={`mx-auto mt-5 max-w-xl space-y-2 text-sm leading-6 sm:text-base ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
           <p>Select a service category or type your problem to begin.</p>
-          <p>Ã Â¦Â¸Ã Â¦Â¾Ã Â¦ÂªÃ Â§â€¹Ã Â¦Â°Ã Â§ÂÃ Â¦Å¸ Ã Â¦Â¶Ã Â§ÂÃ Â¦Â°Ã Â§Â Ã Â¦â€¢Ã Â¦Â°Ã Â¦Â¤Ã Â§â€¡ Ã Â¦ÂÃ Â¦â€¢Ã Â¦Å¸Ã Â¦Â¿ Ã Â¦â€¢Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¾Ã Â¦Å¸Ã Â¦Â¾Ã Â¦â€”Ã Â¦Â°Ã Â¦Â¿ Ã Â¦Â¨Ã Â¦Â¿Ã Â¦Â°Ã Â§ÂÃ Â¦Â¬Ã Â¦Â¾Ã Â¦Å¡Ã Â¦Â¨ Ã Â¦â€¢Ã Â¦Â°Ã Â§ÂÃ Â¦Â¨ Ã Â¦â€¦Ã Â¦Â¥Ã Â¦Â¬Ã Â¦Â¾ Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦Â° Ã Â¦Â¸Ã Â¦Â®Ã Â¦Â¸Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¾ Ã Â¦Â²Ã Â¦Â¿Ã Â¦â€“Ã Â§ÂÃ Â¦Â¨Ã Â¥Â¤</p>
+          <p lang="bn" className="bangla-text">সাপোর্ট শুরু করতে একটি ক্যাটাগরি নির্বাচন করুন অথবা আপনার সমস্যাটি লিখুন।</p>
         </div>
         <div className={`mx-auto mt-6 inline-flex rounded-lg border px-4 py-2 text-sm ${isDarkMode ? 'border-slate-700 bg-[#172033] text-slate-300' : 'border-blue-100 bg-blue-50 text-blue-800'}`}>
           The system will reply in the language you use.
+          <span lang="bn" className="ml-2 bangla-text">সিস্টেমটি আপনার ব্যবহৃত ভাষায় উত্তর দেবে।</span>
         </div>
       </div>
     </div>
@@ -752,7 +753,7 @@ export default function ChatPage() {
         makeMessage(
           'assistant',
           hasBangla(trimmedContent)
-            ? 'Ã Â¦Â¦Ã Â§ÂÃ Â¦Æ’Ã Â¦â€“Ã Â¦Â¿Ã Â¦Â¤, support service Ã Â¦Â¸Ã Â¦Â¾Ã Â¦Â®Ã Â§Å¸Ã Â¦Â¿Ã Â¦â€¢Ã Â¦Â­Ã Â¦Â¾Ã Â¦Â¬Ã Â§â€¡ unavailable. Ã Â¦ÂÃ Â¦â€¢Ã Â¦Å¸Ã Â§Â Ã Â¦ÂªÃ Â¦Â°Ã Â§â€¡ Ã Â¦â€ Ã Â¦Â¬Ã Â¦Â¾Ã Â¦Â° Ã Â¦Å¡Ã Â§â€¡Ã Â¦Â·Ã Â§ÂÃ Â¦Å¸Ã Â¦Â¾ Ã Â¦â€¢Ã Â¦Â°Ã Â§ÂÃ Â¦Â¨Ã Â¥Â¤'
+            ? 'দুঃখিত, support service সাময়িকভাবে unavailable. একটু পরে আবার চেষ্টা করুন।'
             : 'Sorry, support is temporarily unavailable. Please try again in a moment.'
         ),
       ]);
