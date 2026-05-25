@@ -40,6 +40,8 @@ function normalizeTicket(ticket: Partial<LocalSupportTicket>): LocalSupportTicke
     issue: ticket.issue || '',
     solution: ticket.solution || '',
     status: ticket.status || 'AI_HANDLED',
+    assignedPerson: ticket.assignedPerson || '',
+    internalRemarks: ticket.internalRemarks || '',
     createdAt: ticket.createdAt || now,
     updatedAt: ticket.updatedAt || ticket.createdAt || now,
   };

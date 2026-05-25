@@ -14,8 +14,9 @@ const notoSansBengali = Noto_Sans_Bengali({
 });
 
 export const metadata: Metadata = {
-  title: "Excel AI Support",
-  description: "Bangla and English AI-powered support for Excel users.",
+  title: "Excel Service AI | Prototype v1.5A",
+  applicationName: "Excel Service AI",
+  description: "Internal Smart Support Prototype for Excel Technologies service teams.",
 };
 
 export default function RootLayout({

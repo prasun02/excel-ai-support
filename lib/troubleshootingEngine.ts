@@ -13,6 +13,7 @@ import {
   noExactSolutionReply,
   nonSupportReply,
 } from '@/lib/languageUnderstanding';
+import { findModelWiseSolution } from '@/lib/modelWiseKnowledge';
 import type {
   LocalSupportTicket,
   ReplyLanguage,
@@ -154,18 +155,8 @@ function isNotSolved(message: string) {
   const text = normalizeText(message);
 
   return [
-    'no',
-    'not solved',
-    'no not solved',
-    'still problem',
-    'not fixed',
-    'same problem',
-    'kaj hoy nai',
-    'ekhono problem',
-    'না',
-    'সমাধান হয়নি',
-    'এখনো সমস্যা',
-    'ঠিক হয়নি',
+    'no', 'not solved', 'no not solved', 'still problem', 'not fixed', 'same problem', 'kaj hoy nai', 'ekhono problem',
+    '\u09a8\u09be', '\u09b8\u09ae\u09be\u09a7\u09be\u09a8 \u09b9\u09df\u09a8\u09bf', '\u098f\u0996\u09a8\u09cb \u09b8\u09ae\u09b8\u09cd\u09af\u09be', '\u09a0\u09bf\u0995 \u09b9\u09df\u09a8\u09bf',
   ].some((word) => text.includes(normalizeText(word)));
 }
 
@@ -175,112 +166,74 @@ function isSolved(message: string) {
   if (isNotSolved(message)) return false;
 
   return [
-    'yes',
-    'yes solved',
-    'solved',
-    'fixed',
-    'okay',
-    'ok',
-    'done',
-    'হ্যাঁ',
-    'সমাধান হয়েছে',
-    'ঠিক হয়েছে',
+    'yes', 'yes solved', 'solved', 'fixed', 'okay', 'ok', 'done',
+    '\u09b9\u09cd\u09af\u09be\u0981', '\u09b8\u09ae\u09be\u09a7\u09be\u09a8 \u09b9\u09df\u09c7\u099b\u09c7', '\u09a0\u09bf\u0995 \u09b9\u09df\u09c7\u099b\u09c7',
   ].some((word) => text.includes(normalizeText(word)));
 }
 
 function solvedReply(language: ReplyLanguage) {
-  return language === 'bn'
-    ? 'আপনার সমস্যাটি সমাধান হয়েছে জেনে ভালো লাগল। আপনার কি আর কোনো সার্ভিস প্রয়োজন?'
-    : 'Glad to know your problem is solved. Do you need any other service?';
+  return language === 'bn' ? '\u0986\u09aa\u09a8\u09be\u09b0 \u09b8\u09ae\u09b8\u09cd\u09af\u09be\u099f\u09bf \u09b8\u09ae\u09be\u09a7\u09be\u09a8 \u09b9\u09df\u09c7\u099b\u09c7 \u099c\u09c7\u09a8\u09c7 \u09ad\u09be\u09b2\u09cb \u09b2\u09be\u0997\u09b2\u0964 \u0986\u09aa\u09a8\u09be\u09b0 \u0995\u09bf \u0986\u09b0 \u0995\u09cb\u09a8\u09cb \u09b8\u09be\u09b0\u09cd\u09ad\u09bf\u09b8 \u09aa\u09cd\u09b0\u09df\u09cb\u099c\u09a8?' : 'Glad to know your problem is solved. Do you need any other service?';
 }
 
 function categorySelectionReply(language: ReplyLanguage) {
-  return language === 'bn'
-    ? 'অনুগ্রহ করে একটি সার্ভিস ক্যাটাগরি নির্বাচন করুন।'
-    : 'Please select a service category.';
+  return language === 'bn' ? '\u0985\u09a8\u09c1\u0997\u09cd\u09b0\u09b9 \u0995\u09b0\u09c7 \u098f\u0995\u099f\u09bf \u09b8\u09be\u09b0\u09cd\u09ad\u09bf\u09b8 \u0995\u09cd\u09af\u09be\u099f\u09be\u0997\u09b0\u09bf \u09a8\u09bf\u09b0\u09cd\u09ac\u09be\u099a\u09a8 \u0995\u09b0\u09c1\u09a8\u0964' : 'Please select a service category.';
 }
 
 function moreDetailsReply(language: ReplyLanguage) {
-  return language === 'bn'
-    ? 'আপনার সমস্যাটি আরও ভালোভাবে বুঝতে অনুগ্রহ করে কিছু বিস্তারিত লিখুন। যেমন: কী সমস্যা হচ্ছে, কোন মডেল/ডিভাইসে হচ্ছে, এবং কখন থেকে হচ্ছে।'
-    : 'To understand the issue better, please share a few more details. For example: what is happening, which model/device is affected, and when it started.';
+  return language === 'bn' ? '\u0986\u09aa\u09a8\u09be\u09b0 \u09b8\u09ae\u09b8\u09cd\u09af\u09be\u099f\u09bf \u0986\u09b0\u0993 \u09ad\u09be\u09b2\u09cb\u09ad\u09be\u09ac\u09c7 \u09ac\u09c1\u099d\u09a4\u09c7 \u0985\u09a8\u09c1\u0997\u09cd\u09b0\u09b9 \u0995\u09b0\u09c7 \u0995\u09bf\u099b\u09c1 \u09ac\u09bf\u09b8\u09cd\u09a4\u09be\u09b0\u09bf\u09a4 \u09b2\u09bf\u0996\u09c1\u09a8\u0964 \u09af\u09c7\u09ae\u09a8: \u0995\u09c0 \u09b8\u09ae\u09b8\u09cd\u09af\u09be \u09b9\u099a\u09cd\u099b\u09c7, \u0995\u09cb\u09a8 \u09ae\u09a1\u09c7\u09b2/\u09a1\u09bf\u09ad\u09be\u0987\u09b8\u09c7 \u09b9\u099a\u09cd\u099b\u09c7, \u098f\u09ac\u0982 \u0995\u0996\u09a8 \u09a5\u09c7\u0995\u09c7 \u09b9\u099a\u09cd\u099b\u09c7\u0964' : 'To understand the issue better, please share a few more details. For example: what is happening, which model/device is affected, and when it started.';
 }
 
 function intro(flow: TroubleshootingFlow, language: ReplyLanguage) {
   return language === 'bn'
-    ? `আপনি সম্ভবত ${flow.category} → ${flow.issueType} বিষয়ে জানতে চাচ্ছেন।`
-    : `You may be asking about ${flow.category} → ${flow.issueType}.`;
+    ? '\u0986\u09aa\u09a8\u09bf \u09b8\u09ae\u09cd\u09ad\u09ac\u09a4 ' + flow.category + ' -> ' + flow.issueType + ' \u09ac\u09bf\u09b7\u09df\u09c7 \u099c\u09be\u09a8\u09a4\u09c7 \u099a\u09be\u099a\u09cd\u099b\u09c7\u09a8\u0964'
+    : `You may be asking about ${flow.category} -> ${flow.issueType}.`;
 }
 
 function questionReply(flow: TroubleshootingFlow, question: string, language: ReplyLanguage, includeIntro: boolean) {
   const prefix = includeIntro ? `${intro(flow, language)}\n\n` : '';
-
-  return language === 'bn'
-    ? `${prefix}ভালোভাবে বুঝতে অনুগ্রহ করে উত্তর দিন:\n${question}`
-    : `${prefix}To understand better, please answer:\n${question}`;
+  return language === 'bn' ? `${prefix}${'\u09ad\u09be\u09b2\u09cb\u09ad\u09be\u09ac\u09c7 \u09ac\u09c1\u099d\u09a4\u09c7 \u0985\u09a8\u09c1\u0997\u09cd\u09b0\u09b9 \u0995\u09b0\u09c7 \u0989\u09a4\u09cd\u09a4\u09b0 \u09a6\u09bf\u09a8:'}\n${question}` : `${prefix}To understand better, please answer:\n${question}`;
 }
 
-function solutionReply(flow: TroubleshootingFlow, language: ReplyLanguage) {
-  const steps = flow.solutionSteps.map((step, index) => `${index + 1}. ${step}`).join('\n');
-  const solvedQuestion =
-    language === 'bn'
-      ? 'আপনার সমস্যাটি কি সমাধান হয়েছে?\n- হ্যাঁ, সমাধান হয়েছে\n- না, সমাধান হয়নি'
-      : `${flow.solvedQuestion}\n- Yes, solved\n- No, not solved`;
-  const heading = language === 'bn'
-    ? 'অনুগ্রহ করে এই ধাপগুলো চেষ্টা করুন:'
-    : 'Please try these steps:';
-
+function solutionReply(flow: TroubleshootingFlow, language: ReplyLanguage, ticketState?: Partial<LocalSupportTicket>) {
+  const modelSolution = findModelWiseSolution({
+    category: flow.category, issueType: flow.issueType, productModel: ticketState?.productModel || '', message: ticketState?.issue || '',
+  });
+  const solutionSteps = modelSolution?.solutionSteps?.length ? modelSolution.solutionSteps : flow.solutionSteps;
+  const steps = solutionSteps.map((step, index) => `${index + 1}. ${step}`).join('\n');
+  const solvedQuestion = language === 'bn' ? '\u0986\u09aa\u09a8\u09be\u09b0 \u09b8\u09ae\u09b8\u09cd\u09af\u09be\u099f\u09bf \u0995\u09bf \u09b8\u09ae\u09be\u09a7\u09be\u09a8 \u09b9\u09df\u09c7\u099b\u09c7?\n- \u09b9\u09cd\u09af\u09be\u0981, \u09b8\u09ae\u09be\u09a7\u09be\u09a8 \u09b9\u09df\u09c7\u099b\u09c7\n- \u09a8\u09be, \u09b8\u09ae\u09be\u09a7\u09be\u09a8 \u09b9\u09df\u09a8\u09bf' : `${flow.solvedQuestion}\n- Yes, solved\n- No, not solved`;
+  const heading = language === 'bn' ? '\u0985\u09a8\u09c1\u0997\u09cd\u09b0\u09b9 \u0995\u09b0\u09c7 \u098f\u0987 \u09a7\u09be\u09aa\u0997\u09c1\u09b2\u09cb \u099a\u09c7\u09b7\u09cd\u099f\u09be \u0995\u09b0\u09c1\u09a8:' : 'Please try these steps:';
   return `${heading}\n\n${steps}\n\n${solvedQuestion}`;
 }
 
 function purchaseLocationReply(language: ReplyLanguage) {
-  return language === 'bn'
-    ? 'ধন্যবাদ। আপনার লোকেশন অনুযায়ী আমাদের সেলস টিম যোগাযোগ করতে পারবে। অনুগ্রহ করে আপনার ফোন নম্বর দিন অথবা নিকটস্থ Excel sales point-এ যোগাযোগ করুন।'
-    : 'Thank you. Our sales team can contact you based on your location. Please share your phone number or contact your nearest Excel sales point.';
+  return language === 'bn' ? '\u09a7\u09a8\u09cd\u09af\u09ac\u09be\u09a6\u0964 \u0986\u09aa\u09a8\u09be\u09b0 \u09b2\u09cb\u0995\u09c7\u09b6\u09a8 \u0985\u09a8\u09c1\u09af\u09be\u09df\u09c0 \u0986\u09ae\u09be\u09a6\u09c7\u09b0 \u09b8\u09c7\u09b2\u09b8 \u099f\u09bf\u09ae \u09af\u09cb\u0997\u09be\u09af\u09cb\u0997 \u0995\u09b0\u09a4\u09c7 \u09aa\u09be\u09b0\u09ac\u09c7\u0964 \u0985\u09a8\u09c1\u0997\u09cd\u09b0\u09b9 \u0995\u09b0\u09c7 \u0986\u09aa\u09a8\u09be\u09b0 \u09ab\u09cb\u09a8 \u09a8\u09ae\u09cd\u09ac\u09b0 \u09a6\u09bf\u09a8 \u0985\u09a5\u09ac\u09be \u09a8\u09bf\u0995\u099f\u09b8\u09cd\u09a5 Excel sales point-\u098f \u09af\u09cb\u0997\u09be\u09af\u09cb\u0997 \u0995\u09b0\u09c1\u09a8\u0964' : 'Thank you. Our sales team can contact you based on your location. Please share your phone number or contact your nearest Excel sales point.';
 }
 
 function locationSupportReply(message: string, language: ReplyLanguage): LocationReply {
   const text = normalizeText(message);
-  const location = locations.find((item) =>
-    item.keywords.some((keyword) => text.includes(normalizeText(keyword)))
-  );
-
+  const location = locations.find((item) => item.keywords.some((keyword) => text.includes(normalizeText(keyword))));
   if (!location) {
-    return {
-      text: language === 'bn'
-        ? 'ধন্যবাদ। অনুগ্রহ করে আপনার জেলা/লোকেশন আরেকটু পরিষ্কারভাবে লিখুন। আপনি চাইলে এখানে নিকটস্থ support point দেখতে পারেন: https://www.excelbd.com/support/'
-        : 'Thank you. Please write your district/location more clearly. You may also find your nearest support point here: https://www.excelbd.com/support/',
-      locationFound: false,
-    };
+    return { text: language === 'bn' ? '\u09a7\u09a8\u09cd\u09af\u09ac\u09be\u09a6\u0964 \u0985\u09a8\u09c1\u0997\u09cd\u09b0\u09b9 \u0995\u09b0\u09c7 \u0986\u09aa\u09a8\u09be\u09b0 \u099c\u09c7\u09b2\u09be/\u09b2\u09cb\u0995\u09c7\u09b6\u09a8 \u0986\u09b0\u09c7\u0995\u099f\u09c1 \u09aa\u09b0\u09bf\u09b7\u09cd\u0995\u09be\u09b0\u09ad\u09be\u09ac\u09c7 \u09b2\u09bf\u0996\u09c1\u09a8\u0964 \u0986\u09aa\u09a8\u09bf \u099a\u09be\u0987\u09b2\u09c7 \u098f\u0996\u09be\u09a8\u09c7 \u09a8\u09bf\u0995\u099f\u09b8\u09cd\u09a5 support point \u09a6\u09c7\u0996\u09a4\u09c7 \u09aa\u09be\u09b0\u09c7\u09a8: https://www.excelbd.com/support/' : 'Thank you. Please write your district/location more clearly. You may also find your nearest support point here: https://www.excelbd.com/support/', locationFound: false };
   }
-
   return {
     text: language === 'bn'
-      ? `ধন্যবাদ। আপনার নিকটস্থ Excel Customer Support Point:\n\n${location.address}\nContact: ${location.phone}\nEngineer contact: ${location.engineerPhone}\n\nযদি আপনি পণ্য পাঠাতে বা আসতে না পারেন, engineer contact নম্বরে যোগাযোগ করুন।`
-      : `Thank you. Your nearest Excel Customer Support Point:\n\n${location.address}\nContact: ${location.phone}\nEngineer contact: ${location.engineerPhone}\n\nIf you cannot visit or send the product, please contact the CSP engineer.`,
+      ? '\u09a7\u09a8\u09cd\u09af\u09ac\u09be\u09a6\u0964 \u0986\u09aa\u09a8\u09be\u09b0 \u09a8\u09bf\u0995\u099f\u09b8\u09cd\u09a5 Excel Customer Support Point:' + `\n\n${location.address}\nContact: ${location.phone}\nEngineer contact: ${location.engineerPhone}\n\n` + '\u09af\u09a6\u09bf \u0986\u09aa\u09a8\u09bf \u09aa\u09a3\u09cd\u09af \u09aa\u09be\u09a0\u09be\u09a4\u09c7 \u09ac\u09be \u0986\u09b8\u09a4\u09c7 \u09a8\u09be \u09aa\u09be\u09b0\u09c7\u09a8, engineer contact \u09a8\u09ae\u09cd\u09ac\u09b0\u09c7 \u09af\u09cb\u0997\u09be\u09af\u09cb\u0997 \u0995\u09b0\u09c1\u09a8\u0964'
+      : `Thank you. Please contact your nearest Excel Customer Support Point directly for further support.\n\n${location.address}\nContact: ${location.phone}\nEngineer contact: ${location.engineerPhone}\n\nYou may visit the service center physically with your device if needed.`,
     locationFound: true,
   };
 }
 
 function postEscalationPrompt(language: ReplyLanguage) {
-  return language === 'bn'
-    ? 'আপনার যদি অন্য কোনো সমস্যা বা প্রশ্ন থাকে, অনুগ্রহ করে লিখুন।'
-    : 'If you have any other support issue or query, please write it.';
+  return language === 'bn' ? '\u0986\u09aa\u09a8\u09be\u09b0 \u09af\u09a6\u09bf \u0985\u09a8\u09cd\u09af \u0995\u09cb\u09a8\u09cb \u09b8\u09ae\u09b8\u09cd\u09af\u09be \u09ac\u09be \u09aa\u09cd\u09b0\u09b6\u09cd\u09a8 \u09a5\u09be\u0995\u09c7, \u0985\u09a8\u09c1\u0997\u09cd\u09b0\u09b9 \u0995\u09b0\u09c7 \u09b2\u09bf\u0996\u09c1\u09a8\u0964' : 'If you have any other support issue or query, please write it.';
 }
 
 function postEscalationClosingReply(language: ReplyLanguage) {
-  return language === 'bn'
-    ? 'ধন্যবাদ। আপনার যদি অন্য কোনো Excel product support সমস্যা থাকে, অনুগ্রহ করে লিখুন।'
-    : 'Thank you. If you have any other Excel product support issue, please write it.';
+  return language === 'bn' ? '\u09a7\u09a8\u09cd\u09af\u09ac\u09be\u09a6\u0964 \u0986\u09aa\u09a8\u09be\u09b0 \u09af\u09a6\u09bf \u0985\u09a8\u09cd\u09af \u0995\u09cb\u09a8\u09cb Excel product support \u09b8\u09ae\u09b8\u09cd\u09af\u09be \u09a5\u09be\u0995\u09c7, \u0985\u09a8\u09c1\u0997\u09cd\u09b0\u09b9 \u0995\u09b0\u09c7 \u09b2\u09bf\u0996\u09c1\u09a8\u0964' : 'Thank you. If you have any other Excel product support issue, please write it.';
 }
 
 function purchaseQuestion(language: ReplyLanguage, includeIntro: boolean, flow: TroubleshootingFlow) {
-  const question =
-    language === 'bn'
-      ? 'পণ্য ক্রয়ের জন্য অনুগ্রহ করে আপনার কাঙ্ক্ষিত লোকেশন লিখুন। এরপর আমরা আপনাকে সংশ্লিষ্ট সেলস কন্টাক্ট পারসনের সাথে সংযুক্ত করতে সহায়তা করব।'
-      : 'For product purchase support, please mention your desired location. Then we can help connect you with the appropriate sales contact person.';
+  const question = language === 'bn' ? '\u09aa\u09a3\u09cd\u09af \u0995\u09cd\u09b0\u09df\u09c7\u09b0 \u099c\u09a8\u09cd\u09af \u0985\u09a8\u09c1\u0997\u09cd\u09b0\u09b9 \u0995\u09b0\u09c7 \u0986\u09aa\u09a8\u09be\u09b0 \u0995\u09be\u0999\u09cd\u0995\u09cd\u09b7\u09bf\u09a4 \u09b2\u09cb\u0995\u09c7\u09b6\u09a8 \u09b2\u09bf\u0996\u09c1\u09a8\u0964 \u098f\u09b0\u09aa\u09b0 \u0986\u09ae\u09b0\u09be \u0986\u09aa\u09a8\u09be\u0995\u09c7 \u09b8\u0982\u09b6\u09cd\u09b2\u09bf\u09b7\u09cd\u099f \u09b8\u09c7\u09b2\u09b8 \u0995\u09a8\u09cd\u099f\u09be\u0995\u09cd\u099f \u09aa\u09be\u09b0\u09b8\u09a8\u09c7\u09b0 \u09b8\u09be\u09a5\u09c7 \u09b8\u0982\u09af\u09c1\u0995\u09cd\u09a4 \u0995\u09b0\u09a4\u09c7 \u09b8\u09b9\u09be\u09df\u09a4\u09be \u0995\u09b0\u09ac\u0964' : 'For product purchase support, please mention your desired location. Then we can help connect you with the appropriate sales contact person.';
   const prefix = includeIntro ? `${intro(flow, language)}\n\n` : '';
-
   return `${prefix}${question}`;
 }
 
@@ -388,6 +341,42 @@ export function getNextTroubleshootingResponse(input: TroubleshootingInput): Tro
     ? analysis.category
     : input.selectedCategory;
   const selectedCategory = categoryFromContext(ticketState, categoryHint) || analysis.category;
+
+  if (
+    ticketState.awaitingLocation &&
+    ticketState.escalationActive &&
+    !isSolved(input.message) &&
+    !isNotSolved(input.message)
+  ) {
+    const flow =
+      findFlowById(ticketState.currentFlowId) ||
+      flows.find((item) => sameCategory(item.category, selectedCategory)) ||
+      flows[0];
+    const locationReply = locationSupportReply(input.message, language);
+    const responseText = locationReply.locationFound
+      ? `${locationReply.text}\n\n${postEscalationPrompt(language)}`
+      : locationReply.text;
+
+    return result(
+      flow,
+      responseText,
+      buildContext(
+        flow,
+        ticketState.currentQuestionIndex ?? ticketState.currentStep ?? 0,
+        ticketState.askedQuestions || [],
+        [...(ticketState.userAnswers || []), input.message],
+        true,
+        'not_solved',
+        {
+          awaitingLocation: !locationReply.locationFound,
+          escalationActive: !locationReply.locationFound,
+          escalationCompleted: locationReply.locationFound,
+        }
+      ),
+      language,
+      true
+    );
+  }
 
   if (isHumanHelpRequest(input.message)) {
     const knownCategory = categoryFromContext(ticketState, input.selectedCategory);
@@ -642,7 +631,7 @@ export function getNextTroubleshootingResponse(input: TroubleshootingInput): Tro
 
   return result(
     flow,
-    solutionReply(flow, language),
+    solutionReply(flow, language, ticketState),
     buildContext(flow, currentQuestionIndex, askedQuestions, nextAnswers, true, 'pending'),
     language,
     true

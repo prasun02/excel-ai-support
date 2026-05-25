@@ -1,0 +1,60 @@
+[
+  {
+    "category": "Router / Internet",
+    "brand": "TP-Link",
+    "productModel": "Archer C6",
+    "modelFamily": "Archer",
+    "deviceType": "router",
+    "issueType": "Slow Internet",
+    "problemKeywords": ["slow internet", "buffering", "net slow"],
+    "banglaKeywords": ["নেট স্লো", "ইন্টারনেট স্লো"],
+    "banglishKeywords": ["net slo", "net slow", "buffering hocche"],
+    "misspellings": ["net slw", "net slo"],
+    "customerSymptomExample": "My Archer C6 internet is buffering.",
+    "diagnosticQuestions": ["Are you using WiFi or LAN?", "Is the issue happening on all devices?"],
+    "solutionSteps": [
+      "Restart the Archer C6 and wait 2 minutes.",
+      "Check the WAN cable and make sure it is firmly connected.",
+      "Place the router in an open area away from walls.",
+      "If many devices are connected, disconnect unused devices and test again."
+    ],
+    "repairImageUrl": "",
+    "repairVideoUrl": "",
+    "riskAfterSolution": "Speed may still vary if the upstream ISP link is unstable.",
+    "nextPossibleProblem": "WAN link or firmware issue",
+    "nextSolutionSteps": ["Check WAN status page.", "Update firmware only from the official model page."],
+    "whenToEscalate": "Escalate if speed remains very low after cable and restart checks.",
+    "escalationMessage": "Please contact your nearest Excel Customer Support Point.",
+    "priority": "high",
+    "active": true
+  },
+  {
+    "category": "Camera / DVR / NVR",
+    "brand": "Hikvision",
+    "productModel": "DS-2CE",
+    "modelFamily": "Turbo HD",
+    "deviceType": "camera",
+    "issueType": "Camera Offline",
+    "problemKeywords": ["camera offline", "camera not showing", "no video"],
+    "banglaKeywords": ["ক্যামেরা দেখাচ্ছে না"],
+    "banglishKeywords": ["camera show kore na"],
+    "misspellings": ["camra offline"],
+    "customerSymptomExample": "Camera show kore na.",
+    "diagnosticQuestions": ["Is camera power available?", "Is the cable connected properly?"],
+    "solutionSteps": [
+      "Check camera power adapter or PoE port.",
+      "Check BNC/network cable connection.",
+      "Restart the DVR/NVR and wait until cameras reconnect.",
+      "Test the camera on another channel if available."
+    ],
+    "repairImageUrl": "",
+    "repairVideoUrl": "",
+    "riskAfterSolution": "Faulty cable or power adapter may require replacement.",
+    "nextPossibleProblem": "Camera cable, power, or channel issue",
+    "nextSolutionSteps": ["Test with a known-good cable.", "Contact CSP if the camera remains offline."],
+    "whenToEscalate": "Escalate if camera stays offline after cable and power checks.",
+    "escalationMessage": "Please contact your nearest Excel Customer Support Point.",
+    "priority": "high",
+    "active": true
+  }
+]

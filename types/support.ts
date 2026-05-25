@@ -1,6 +1,6 @@
 export type ReplyLanguage = 'en' | 'bn';
 
-export type LocalTicketStatus = 'AI_HANDLED';
+export type LocalTicketStatus = 'Open' | 'In Progress' | 'Solved' | 'Escalated' | 'AI_HANDLED';
 
 export type SupportChatMessage = {
   role: 'user' | 'assistant';
@@ -49,6 +49,8 @@ export type LocalSupportTicket = {
   issue: string;
   solution: string;
   status: LocalTicketStatus;
+  assignedPerson?: string;
+  internalRemarks?: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -86,6 +88,31 @@ export type SupportIntentItem = {
   diagnosticQuestions: string[];
   solutionSteps: string[];
   followUpQuestion: string;
+  escalationMessage: string;
+  priority: 'high' | 'medium' | 'low';
+  active: boolean;
+};
+
+export type ModelWiseSupportKnowledgeItem = {
+  category: string;
+  brand: string;
+  productModel: string;
+  modelFamily: string;
+  deviceType: string;
+  issueType: string;
+  problemKeywords: string[];
+  banglaKeywords: string[];
+  banglishKeywords: string[];
+  misspellings: string[];
+  customerSymptomExample: string;
+  diagnosticQuestions: string[];
+  solutionSteps: string[];
+  repairImageUrl: string;
+  repairVideoUrl: string;
+  riskAfterSolution: string;
+  nextPossibleProblem: string;
+  nextSolutionSteps: string[];
+  whenToEscalate: string;
   escalationMessage: string;
   priority: 'high' | 'medium' | 'low';
   active: boolean;

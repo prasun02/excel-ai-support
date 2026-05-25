@@ -73,7 +73,7 @@ const categories: SupportCategory[] = [
   {
     icon: FaHeadset,
     label: 'New Product Purchase',
-    banglaLabel: 'নতুন পণ্য ক্রয়',
+    banglaLabel: '???? ???? ????',
     value: 'New Product Purchase',
   },
   { icon: FaHeadset, label: 'Other Product', value: 'General' },
@@ -190,7 +190,7 @@ function getCategoryFromMessage(message: string) {
 
 function categoryChoicePrompt(language: ReplyLanguage) {
   return language === 'bn'
-    ? 'অনুগ্রহ করে একটি সার্ভিস ক্যাটাগরি নির্বাচন করুন।'
+    ? '??????? ??? ???? ??????? ????????? ???????? ?????'
     : 'Please select a service category.';
 }
 
@@ -208,19 +208,19 @@ function shouldShowCategoryChoices(message: SupportChatMessage) {
 function categorySelectedMessage(category: string, language: ReplyLanguage) {
   const selectedText =
     language === 'bn'
-      ? `আপনি ${category} ক্যাটাগরি নির্বাচন করেছেন।`
+      ? '???? ' + category + ' ????????? ???????? ???????'
       : `You selected ${category}.`;
 
   return `${selectedText}\n\n${
     language === 'bn'
-      ? 'অনুগ্রহ করে এখন আপনার সমস্যাটি লিখুন বা বলুন।'
+      ? '??????? ??? ??? ????? ???????? ????? ?? ?????'
       : 'Please write or tell your issue now.'
   }`;
 }
 
 function purchaseSetupMessage(language: ReplyLanguage) {
   return language === 'bn'
-    ? 'পণ্য ক্রয়ের জন্য অনুগ্রহ করে আপনার কাঙ্ক্ষিত লোকেশন লিখুন। এরপর আমরা আপনাকে সংশ্লিষ্ট সেলস কন্টাক্ট পারসনের সাথে সংযুক্ত করতে সহায়তা করব।'
+    ? '???? ?????? ???? ??????? ??? ????? ????????? ?????? ?????? ???? ???? ?????? ????????? ???? ???????? ??????? ???? ??????? ???? ?????? ????'
     : 'For product purchase support, please mention your desired location. Then we can help connect you with the appropriate sales contact person.';
 }
 
@@ -230,19 +230,19 @@ function isTechnicalCategory(category: string) {
 
 function optionalProductInfoMessage(language: ReplyLanguage) {
   return language === 'bn'
-    ? '\u0986\u09aa\u09a8\u09be\u09b0 \u0995\u09be\u099b\u09c7 \u09a5\u09be\u0995\u09b2\u09c7 \u0985\u09a8\u09c1\u0997\u09cd\u09b0\u09b9 \u0995\u09b0\u09c7 \u09aa\u09a3\u09cd\u09af\u09c7\u09b0 \u09ae\u09a1\u09c7\u09b2 \u098f\u09ac\u0982 \u09b8\u09bf\u09b0\u09bf\u09df\u09be\u09b2 \u09a8\u09ae\u09cd\u09ac\u09b0/SN \u09b2\u09bf\u0996\u09c1\u09a8\u0964 \u098f\u0996\u09a8 \u09a8\u09be \u09a5\u09be\u0995\u09b2\u09c7 \u09b8\u09cd\u0995\u09bf\u09aa \u0995\u09b0\u09c7 \u09b8\u09b0\u09be\u09b8\u09b0\u09bf \u09b8\u09ae\u09b8\u09cd\u09af\u09be\u099f\u09bf \u09b2\u09bf\u0996\u09a4\u09c7 \u09aa\u09be\u09b0\u09c7\u09a8\u0964'
-    : 'Please share your product model and serial number/SN if available. If you do not have it now, you can skip and write your problem directly.';
+    ? '????? ???? ????? ??????? ??? ???????? ???? ??? ??????? ?????/SN ?????? ??? ?? ????? ????? ??? ?????? ???????? ????? ??????'
+    : 'Please share your device model and serial number/SN if available. If you do not have it now, you may skip and write your problem directly.';
 }
 
 function productInfoSavedMessage(language: ReplyLanguage) {
   return language === 'bn'
-    ? '\u09a7\u09a8\u09cd\u09af\u09ac\u09be\u09a6\u0964 \u0986\u09aa\u09a8\u09be\u09b0 \u09aa\u09a3\u09cd\u09af\u09c7\u09b0 \u09a4\u09a5\u09cd\u09af Excel product support case \u09b9\u09bf\u09b8\u09c7\u09ac\u09c7 \u09b8\u0982\u09b0\u0995\u09cd\u09b7\u09a3 \u0995\u09b0\u09be \u09b9\u09df\u09c7\u099b\u09c7\u0964 \u0985\u09a8\u09c1\u0997\u09cd\u09b0\u09b9 \u0995\u09b0\u09c7 \u0986\u09aa\u09a8\u09bf \u09af\u09c7 \u09b8\u09ae\u09b8\u09cd\u09af\u09be\u099f\u09bf \u09aa\u09be\u099a\u09cd\u099b\u09c7\u09a8 \u09a4\u09be \u09b2\u09bf\u0996\u09c1\u09a8\u0964'
-    : 'Thank you. Your product information has been noted as an Excel product support case. Please write the problem you are facing.';
+    ? '???????? ????? ?????? ???? ??????? ??? ?????? ??????? ??? ???? ?? ???????? ??????? ?? ??????'
+    : 'Thank you. Your product information has been noted. Please write the problem you are facing.';
 }
 
 function productInfoSkippedMessage(language: ReplyLanguage) {
   return language === 'bn'
-    ? '\u09a0\u09bf\u0995 \u0986\u099b\u09c7\u0964 \u0985\u09a8\u09c1\u0997\u09cd\u09b0\u09b9 \u0995\u09b0\u09c7 \u0986\u09aa\u09a8\u09be\u09b0 \u09b8\u09ae\u09b8\u09cd\u09af\u09be\u099f\u09bf \u09b2\u09bf\u0996\u09c1\u09a8 \u09ac\u09be \u09ac\u09b2\u09c1\u09a8\u0964'
+    ? '??? ???? ??????? ??? ????? ???????? ????? ?? ?????'
     : 'No problem. Please write or tell your issue now.';
 }
 
@@ -334,18 +334,20 @@ function WelcomeCard({ isDarkMode }: { isDarkMode: boolean }) {
           <FaHeadset className="text-2xl" />
         </div>
         <h2 className="mt-5 text-2xl font-semibold tracking-normal sm:text-3xl">
-          Welcome to Excel AI Smart Support
+          <span className="block">Excel Service AI</span>
+          <span className="block text-lg font-medium text-blue-500 sm:text-xl">Prototype v1.5A</span>
         </h2>
         <p lang="bn" className={`mt-2 text-lg bangla-text ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
-          এক্সেল এআই স্মার্ট সাপোর্টে স্বাগতম।
+          {'?????? ??????? ????? ????????'}
         </p>
         <div className={`mx-auto mt-5 max-w-xl space-y-2 text-sm leading-6 sm:text-base ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p>Internal Smart Support Prototype</p>
           <p>Select a service category or type your problem to begin.</p>
-          <p lang="bn" className="bangla-text">সাপোর্ট শুরু করতে একটি ক্যাটাগরি নির্বাচন করুন অথবা আপনার সমস্যাটি লিখুন।</p>
+          <p lang="bn" className="bangla-text">{'??????? ???? ???? ???? ????????? ???????? ???? ???? ????? ???????? ??????'}</p>
         </div>
         <div className={`mx-auto mt-6 inline-flex rounded-lg border px-4 py-2 text-sm ${isDarkMode ? 'border-slate-700 bg-[#172033] text-slate-300' : 'border-blue-100 bg-blue-50 text-blue-800'}`}>
           The system will reply in the language you use.
-          <span lang="bn" className="ml-2 bangla-text">সিস্টেমটি আপনার ব্যবহৃত ভাষায় উত্তর দেবে।</span>
+          <span lang="bn" className="ml-2 bangla-text">{'????????? ????? ??????? ????? ????? ?????'}</span>
         </div>
       </div>
     </div>
@@ -433,10 +435,7 @@ export default function ChatPage() {
         setRequesterContact(restoredTicket.customerContact);
         setSelectedCategory(getCategoryByValue(restoredTicket.selectedCategory || restoredTicket.category));
       } else {
-        const backgroundTicket = createAutoTicket(restoredCategory?.value || '', [], '', '');
-
-        setActiveTicket(backgroundTicket);
-        setTickets(upsertTicket(backgroundTicket));
+        setActiveTicket(null);
         setSelectedCategory(restoredCategory);
       }
     }, 0);
@@ -771,7 +770,7 @@ export default function ChatPage() {
         makeMessage(
           'assistant',
           hasBangla(trimmedContent)
-            ? 'দুঃখিত, support service সাময়িকভাবে unavailable. একটু পরে আবার চেষ্টা করুন।'
+            ? '??????, support service ?????????? unavailable. ???? ??? ???? ?????? ?????'
             : 'Sorry, support is temporarily unavailable. Please try again in a moment.'
         ),
       ]);
@@ -781,21 +780,11 @@ export default function ChatPage() {
   }
   function startNewCustomer() {
     clearActiveTicket();
-    const backgroundTicket = createAutoTicket('', [], '', '');
 
-    setActiveTicket(backgroundTicket);
-    setTickets(upsertTicket(backgroundTicket));
+    setActiveTicket(null);
     setSelectedCategory(null);
     setInput('');
     setMessages([]);
-    setAwaitingCategorySelection(false);
-  }
-
-  function loadTicketFromHistory(ticket: LocalSupportTicket) {
-    setTicketState(ticket);
-    setMessages(ticket.messages);
-    setRequesterName(ticket.customerName);
-    setRequesterContact(ticket.customerContact);
     setAwaitingCategorySelection(false);
   }
 
@@ -858,11 +847,13 @@ export default function ChatPage() {
 
             <div className="min-w-0">
               <h1 className="truncate text-xl font-semibold tracking-normal sm:text-2xl">
-                Excel AI Smart Support
+                Excel Service AI
               </h1>
-              <div className={`mt-1 flex items-center gap-2 text-sm ${mutedTextClass}`}>
+              <div className={`mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm ${mutedTextClass}`}>
                 <FaRegCircle className="h-2 w-2 fill-emerald-500 text-emerald-500" />
-                <span>Support desk online</span>
+                <span>Prototype v1.5A</span>
+                <span className="hidden sm:inline">·</span>
+                <span>Internal Smart Support Prototype</span>
               </div>
             </div>
           </div>
@@ -899,40 +890,22 @@ export default function ChatPage() {
                 Current Session
               </p>
               <div className={`mt-3 rounded-lg border p-4 ${subtleSurfaceClass}`}>
-                <p className="font-semibold">
-                  {activeTicket?.ticketId || 'No ticket yet'}
+                <p className={`text-xs font-semibold uppercase tracking-[0.14em] ${mutedTextClass}`}>
+                  Current Ticket No.
                 </p>
-                <p className={`mt-1 text-sm ${mutedTextClass}`}>
-                  {activeTicket
-                    ? 'This same ticket is used for further chat.'
-                    : 'A background ticket is created for each new customer.'}
+                <p className="mt-1 font-semibold">
+                  Ticket No: {activeTicket?.ticketId || 'No ticket yet'}
                 </p>
+                <p className={`mt-4 text-xs font-semibold uppercase tracking-[0.14em] ${mutedTextClass}`}>
+                  Users Amount
+                </p>
+                <p className="mt-1 text-2xl font-semibold">{Math.max(tickets.length, activeTicket ? 1 : 0)}</p>
                 {(activeTicket?.productModel || activeTicket?.serialNumber) && (
                   <div className={`mt-3 space-y-1 border-t pt-3 text-sm ${mutedTextClass}`}>
                     {activeTicket.productModel && <p>Model: {activeTicket.productModel}</p>}
                     {activeTicket.serialNumber && <p>SN: {activeTicket.serialNumber}</p>}
                   </div>
                 )}
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <p className={`mb-3 text-xs font-semibold uppercase tracking-[0.14em] ${mutedTextClass}`}>
-                Customer Details
-              </p>
-              <div className="space-y-3">
-                <input
-                  value={requesterName}
-                  onChange={(e) => setRequesterName(e.target.value)}
-                  placeholder="Customer name"
-                  className={`h-11 w-full rounded-lg border px-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${inputClass}`}
-                />
-                <input
-                  value={requesterContact}
-                  onChange={(e) => setRequesterContact(e.target.value)}
-                  placeholder="Phone or email"
-                  className={`h-11 w-full rounded-lg border px-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${inputClass}`}
-                />
               </div>
             </div>
 
@@ -971,38 +944,6 @@ export default function ChatPage() {
               </div>
             </div>
 
-            <div>
-              <p className={`mb-3 text-xs font-semibold uppercase tracking-[0.14em] ${mutedTextClass}`}>
-                Recent Tickets
-              </p>
-              <div className="space-y-2">
-                {tickets.length === 0 && (
-                  <div className={`rounded-lg border p-3 text-sm ${subtleSurfaceClass}`}>
-                    No tickets yet.
-                  </div>
-                )}
-
-                {tickets.slice(0, 5).map((ticket) => (
-                  <button
-                    key={ticket.ticketId}
-                    type="button"
-                    onClick={() => loadTicketFromHistory(ticket)}
-                    className={`w-full rounded-lg border p-3 text-left transition hover:border-blue-300 ${subtleSurfaceClass}`}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="truncate text-sm font-semibold">{ticket.ticketId}</p>
-                      <span className="rounded-md bg-emerald-500/15 px-2 py-1 text-xs font-medium text-emerald-500">
-                        {ticket.status.replace('_', ' ')}
-                      </span>
-                    </div>
-                    <p className="mt-2 line-clamp-2 text-sm">{ticket.issue || 'Support conversation'}</p>
-                    <p className={`mt-1 text-xs ${mutedTextClass}`}>
-                      {ticket.selectedCategory || ticket.category}
-                    </p>
-                  </button>
-                ))}
-              </div>
-            </div>
           </aside>
 
           <section className="flex min-h-0 flex-col">

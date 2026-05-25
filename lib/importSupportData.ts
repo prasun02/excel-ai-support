@@ -1,4 +1,4 @@
-import type { SupportIntentItem } from '@/types/support';
+import type { ModelWiseSupportKnowledgeItem, SupportIntentItem } from '@/types/support';
 
 export type SupportCsvRow = {
   category: string;
@@ -11,6 +11,31 @@ export type SupportCsvRow = {
   diagnosticQuestions: string;
   solutionSteps: string;
   followUpQuestion: string;
+  escalationMessage: string;
+  priority: string;
+  active: string;
+};
+
+export type ModelWiseSupportCsvRow = {
+  category: string;
+  brand: string;
+  productModel: string;
+  modelFamily: string;
+  deviceType: string;
+  issueType: string;
+  problemKeywords: string;
+  banglaKeywords: string;
+  banglishKeywords: string;
+  misspellings: string;
+  customerSymptomExample: string;
+  diagnosticQuestions: string;
+  solutionSteps: string;
+  repairImageUrl: string;
+  repairVideoUrl: string;
+  riskAfterSolution: string;
+  nextPossibleProblem: string;
+  nextSolutionSteps: string;
+  whenToEscalate: string;
   escalationMessage: string;
   priority: string;
   active: string;
@@ -49,7 +74,35 @@ export function supportCsvRowToIntent(row: SupportCsvRow): SupportIntentItem {
   };
 }
 
+export function modelWiseCsvRowToKnowledge(row: ModelWiseSupportCsvRow): ModelWiseSupportKnowledgeItem {
+  return {
+    category: row.category.trim(),
+    brand: row.brand.trim(),
+    productModel: row.productModel.trim(),
+    modelFamily: row.modelFamily.trim(),
+    deviceType: row.deviceType.trim(),
+    issueType: row.issueType.trim(),
+    problemKeywords: splitList(row.problemKeywords),
+    banglaKeywords: splitList(row.banglaKeywords),
+    banglishKeywords: splitList(row.banglishKeywords),
+    misspellings: splitList(row.misspellings),
+    customerSymptomExample: row.customerSymptomExample.trim(),
+    diagnosticQuestions: splitList(row.diagnosticQuestions),
+    solutionSteps: splitList(row.solutionSteps),
+    repairImageUrl: row.repairImageUrl.trim(),
+    repairVideoUrl: row.repairVideoUrl.trim(),
+    riskAfterSolution: row.riskAfterSolution.trim(),
+    nextPossibleProblem: row.nextPossibleProblem.trim(),
+    nextSolutionSteps: splitList(row.nextSolutionSteps),
+    whenToEscalate: row.whenToEscalate.trim(),
+    escalationMessage: row.escalationMessage.trim(),
+    priority: priorityValue(row.priority.trim().toLowerCase()),
+    active: row.active.trim().toLowerCase() === 'true',
+  };
+}
+
 // Beginner-friendly note:
 // For production, use a proper CSV parser when importing uploaded Excel/CSV files.
 // This helper keeps the data shape clear so a future script can convert CSV rows
-// into data/supportIntents.json or Supabase troubleshooting_flows records.
+// into data/supportIntents.json, data/modelWiseSupportKnowledge.json, or
+// Supabase troubleshooting_flows records.
