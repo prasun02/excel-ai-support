@@ -19,12 +19,16 @@ export type TroubleshootingContext = {
   userAnswers: string[];
   solutionGiven: boolean;
   solvedStatus: SolvedStatus;
+  productInfoAsked?: boolean;
 };
 
 export type LocalSupportTicket = {
   ticketId: string;
   customerName: string;
   customerContact: string;
+  productModel: string;
+  serialNumber: string;
+  productInfoAsked: boolean;
   selectedCategory: string;
   messages: SupportChatMessage[];
   issueType: string;

@@ -20,6 +20,7 @@ import {
   isHumanHelpRequest,
   nonSupportReply,
 } from '@/lib/languageUnderstanding';
+import { isProductInfoSkip, parseProductInfo } from '@/lib/productInfoParser';
 import {
   appendMessagesToTicket,
   clearActiveTicket,
@@ -223,6 +224,28 @@ function purchaseSetupMessage(language: ReplyLanguage) {
     : 'For product purchase support, please mention your desired location. Then we can help connect you with the appropriate sales contact person.';
 }
 
+function isTechnicalCategory(category: string) {
+  return Boolean(category && category !== 'New Product Purchase');
+}
+
+function optionalProductInfoMessage(language: ReplyLanguage) {
+  return language === 'bn'
+    ? '\u0986\u09aa\u09a8\u09be\u09b0 \u0995\u09be\u099b\u09c7 \u09a5\u09be\u0995\u09b2\u09c7 \u0985\u09a8\u09c1\u0997\u09cd\u09b0\u09b9 \u0995\u09b0\u09c7 \u09aa\u09a3\u09cd\u09af\u09c7\u09b0 \u09ae\u09a1\u09c7\u09b2 \u098f\u09ac\u0982 \u09b8\u09bf\u09b0\u09bf\u09df\u09be\u09b2 \u09a8\u09ae\u09cd\u09ac\u09b0/SN \u09b2\u09bf\u0996\u09c1\u09a8\u0964 \u098f\u0996\u09a8 \u09a8\u09be \u09a5\u09be\u0995\u09b2\u09c7 \u09b8\u09cd\u0995\u09bf\u09aa \u0995\u09b0\u09c7 \u09b8\u09b0\u09be\u09b8\u09b0\u09bf \u09b8\u09ae\u09b8\u09cd\u09af\u09be\u099f\u09bf \u09b2\u09bf\u0996\u09a4\u09c7 \u09aa\u09be\u09b0\u09c7\u09a8\u0964'
+    : 'Please share your product model and serial number/SN if available. If you do not have it now, you can skip and write your problem directly.';
+}
+
+function productInfoSavedMessage(language: ReplyLanguage) {
+  return language === 'bn'
+    ? '\u09a7\u09a8\u09cd\u09af\u09ac\u09be\u09a6\u0964 \u0986\u09aa\u09a8\u09be\u09b0 \u09aa\u09a3\u09cd\u09af\u09c7\u09b0 \u09a4\u09a5\u09cd\u09af Excel product support case \u09b9\u09bf\u09b8\u09c7\u09ac\u09c7 \u09b8\u0982\u09b0\u0995\u09cd\u09b7\u09a3 \u0995\u09b0\u09be \u09b9\u09df\u09c7\u099b\u09c7\u0964 \u0985\u09a8\u09c1\u0997\u09cd\u09b0\u09b9 \u0995\u09b0\u09c7 \u0986\u09aa\u09a8\u09bf \u09af\u09c7 \u09b8\u09ae\u09b8\u09cd\u09af\u09be\u099f\u09bf \u09aa\u09be\u099a\u09cd\u099b\u09c7\u09a8 \u09a4\u09be \u09b2\u09bf\u0996\u09c1\u09a8\u0964'
+    : 'Thank you. Your product information has been noted as an Excel product support case. Please write the problem you are facing.';
+}
+
+function productInfoSkippedMessage(language: ReplyLanguage) {
+  return language === 'bn'
+    ? '\u09a0\u09bf\u0995 \u0986\u099b\u09c7\u0964 \u0985\u09a8\u09c1\u0997\u09cd\u09b0\u09b9 \u0995\u09b0\u09c7 \u0986\u09aa\u09a8\u09be\u09b0 \u09b8\u09ae\u09b8\u09cd\u09af\u09be\u099f\u09bf \u09b2\u09bf\u0996\u09c1\u09a8 \u09ac\u09be \u09ac\u09b2\u09c1\u09a8\u0964'
+    : 'No problem. Please write or tell your issue now.';
+}
+
 function createTicketFromApiResponse(
   data: ChatApiResponse,
   messages: SupportChatMessage[],
@@ -235,6 +258,9 @@ function createTicketFromApiResponse(
     ticketId: data.ticketId,
     customerName,
     customerContact,
+    productModel: data.ticketContext?.productModel || '',
+    serialNumber: data.ticketContext?.serialNumber || '',
+    productInfoAsked: Boolean(data.ticketContext?.productInfoAsked),
     selectedCategory: data.category,
     messages,
     issueType: data.ticketContext?.issueType || '',
@@ -266,6 +292,9 @@ function createAutoTicket(
     ticketId: generateTicketId(),
     customerName,
     customerContact,
+    productModel: '',
+    serialNumber: '',
+    productInfoAsked: false,
     selectedCategory: category || 'General Support',
     messages,
     issueType: '',
@@ -466,6 +495,9 @@ export default function ChatPage() {
       const saved = appendMessagesToTicket(ticket, [...unsavedBaseMessages, assistantMessage], {
         customerName: requesterName,
         customerContact: requesterContact,
+        productModel: data.ticketContext?.productModel || ticket.productModel,
+        serialNumber: data.ticketContext?.serialNumber || ticket.serialNumber,
+        productInfoAsked: data.ticketContext?.productInfoAsked ?? ticket.productInfoAsked,
         selectedCategory: data.category,
         category: data.category,
         issueType: data.ticketContext?.issueType || ticket.issueType,
@@ -516,11 +548,15 @@ export default function ChatPage() {
 
     const language: ReplyLanguage = 'en';
     const userMessage = makeMessage('user', category.label);
+    const shouldAskProductInfo =
+      isTechnicalCategory(category.value) && !activeTicket?.productInfoAsked;
     const assistantMessage = makeMessage(
       'assistant',
       isPurchaseCategory(category.value)
         ? `You selected ${category.value}.\n\n${purchaseSetupMessage(language)}`
-        : categorySelectedMessage(category.value, language)
+        : shouldAskProductInfo
+          ? `You selected ${category.value}.\n\n${optionalProductInfoMessage(language)}`
+          : categorySelectedMessage(category.value, language)
     );
     const nextMessages = [...messages, userMessage, assistantMessage];
 
@@ -540,6 +576,7 @@ export default function ChatPage() {
         userAnswers: [],
         solutionGiven: false,
         solvedStatus: 'pending',
+        productInfoAsked: activeTicket.productInfoAsked || isTechnicalCategory(category.value),
         customerName: requesterName,
         customerContact: requesterContact,
       });
@@ -547,7 +584,11 @@ export default function ChatPage() {
       return;
     }
 
-    setTicketState(createAutoTicket(category.value, nextMessages, requesterName, requesterContact));
+    const ticket = createAutoTicket(category.value, nextMessages, requesterName, requesterContact);
+    setTicketState({
+      ...ticket,
+      productInfoAsked: shouldAskProductInfo,
+    });
     setAwaitingCategorySelection(false);
   }
 
@@ -574,6 +615,45 @@ export default function ChatPage() {
 
       const currentCategory = selectedCategory?.value || workingTicket.selectedCategory || workingTicket.category;
       const hasRealCategory = Boolean(currentCategory && currentCategory !== 'General Support');
+      const productInfo = parseProductInfo(trimmedContent);
+
+      if (productInfo.hasProductInfo && !analysis.issueType) {
+        const assistantMessage = makeMessage('assistant', productInfoSavedMessage(language));
+        const saved = appendMessagesToTicket(workingTicket, [userMessage, assistantMessage], {
+          customerName: requesterName,
+          customerContact: requesterContact,
+          productModel: productInfo.model || workingTicket.productModel,
+          serialNumber: productInfo.serialNumber || workingTicket.serialNumber,
+          productInfoAsked: true,
+        });
+
+        setTicketState(saved.ticket, saved.tickets);
+        setMessages([...messages, userMessage, assistantMessage]);
+        setAwaitingCategorySelection(false);
+        return;
+      }
+
+      if (
+        hasRealCategory &&
+        isTechnicalCategory(currentCategory) &&
+        workingTicket.productInfoAsked &&
+        !workingTicket.currentFlowId &&
+        !workingTicket.issueType &&
+        isProductInfoSkip(trimmedContent) &&
+        !analysis.issueType
+      ) {
+        const assistantMessage = makeMessage('assistant', productInfoSkippedMessage(language));
+        const saved = appendMessagesToTicket(workingTicket, [userMessage, assistantMessage], {
+          customerName: requesterName,
+          customerContact: requesterContact,
+          productInfoAsked: true,
+        });
+
+        setTicketState(saved.ticket, saved.tickets);
+        setMessages([...messages, userMessage, assistantMessage]);
+        setAwaitingCategorySelection(false);
+        return;
+      }
 
       if (!hasRealCategory || awaitingCategorySelection) {
         const shortcutCategory = getCategoryFromShortcut(trimmedContent);
@@ -620,7 +700,12 @@ export default function ChatPage() {
         }
 
         if (shortcutCategory && !analysis.issueType) {
-          const assistantMessage = makeMessage('assistant', categorySelectedMessage(shortcutCategory.value, language));
+          const assistantText = isPurchaseCategory(shortcutCategory.value)
+            ? `${categorySelectedMessage(shortcutCategory.value, language)}\n\n${purchaseSetupMessage(language)}`
+            : workingTicket.productInfoAsked
+              ? categorySelectedMessage(shortcutCategory.value, language)
+              : `${categorySelectedMessage(shortcutCategory.value, language)}\n\n${optionalProductInfoMessage(language)}`;
+          const assistantMessage = makeMessage('assistant', assistantText);
           const saved = appendMessagesToTicket(workingTicket, [userMessage, assistantMessage], {
             selectedCategory: shortcutCategory.value,
             category: shortcutCategory.value,
@@ -632,6 +717,7 @@ export default function ChatPage() {
             userAnswers: [],
             solutionGiven: false,
             solvedStatus: 'pending',
+            productInfoAsked: workingTicket.productInfoAsked || isTechnicalCategory(shortcutCategory.value),
             customerName: requesterName,
             customerContact: requesterContact,
           });
@@ -802,6 +888,12 @@ export default function ChatPage() {
                     ? 'This same ticket is used for further chat.'
                     : 'A background ticket is created for each new customer.'}
                 </p>
+                {(activeTicket?.productModel || activeTicket?.serialNumber) && (
+                  <div className={`mt-3 space-y-1 border-t pt-3 text-sm ${mutedTextClass}`}>
+                    {activeTicket.productModel && <p>Model: {activeTicket.productModel}</p>}
+                    {activeTicket.serialNumber && <p>SN: {activeTicket.serialNumber}</p>}
+                  </div>
+                )}
               </div>
             </div>
 
