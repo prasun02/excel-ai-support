@@ -1,0 +1,3 @@
+category,modelFamily,problemName,symptomsKeywords,defaultFirstStepGroupCode,active
+Router / Internet,General,Internet Auto Disconnect,internet auto disconnect;net disconnect;wifi disconnect;connection drops;router disconnect;auto cut,CHECK_ADAPTER,TRUE
+Router / Internet,General,Slow Internet,net slow;internet slow;wifi slow;speed low;browsing slow,CHECK_SPEED_BASIC,TRUE

@@ -1,0 +1,3 @@
+problemName,questionOrder,questionText,answerType,answerOptions,yesNextQuestionOrder,noNextQuestionOrder,yesStepGroupCode,noStepGroupCode,notSureStepGroupCode,active
+Internet Auto Disconnect,1,Is the router power light turning off or restarting when the internet disconnects?,choice,Yes;No;Not sure,2,2,CHECK_ADAPTER,,CHECK_ADAPTER,TRUE
+Internet Auto Disconnect,2,Does the issue happen on WiFi only or also with LAN cable?,choice,WiFi only;LAN also;Not sure,3,3,CHECK_WIFI_INTERFERENCE,CHECK_ISP_ONU,CHECK_ISP_ONU,TRUE

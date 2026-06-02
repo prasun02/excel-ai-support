@@ -6,11 +6,15 @@ import productsData from '@/data/support-knowledge/products.json';
 
 type ProductKnowledge = {
   productId: string;
+  itemName?: string;
+  itemCode?: string;
+  itemGroup?: string;
   category: string;
   brand: string;
   model: string;
   modelFamily: string;
   deviceType: string;
+  requiresSerial?: boolean;
   active: boolean;
 };
 
@@ -20,6 +24,8 @@ type CommonProblemKnowledge = {
   modelFamily: string;
   problemName: string;
   symptoms: string[];
+  possibleCauses?: string[];
+  customerExplanation?: string;
   solutionSteps: string[];
   nextIfNotSolved: string;
   active: boolean;
@@ -61,6 +67,7 @@ export type ManualSupportInput = {
   modelFamily?: string;
   activeSolutionId?: string;
   lastProblemName?: string;
+  serialNumber?: string;
 };
 
 export type ManualSupportResult = {
@@ -105,6 +112,28 @@ const notSolvedKeywords = [
   'problem remains',
 ];
 
+const warrantyOrReplacementKeywords = [
+  'warranty',
+  'replacement',
+  'replace',
+  'rma',
+  'claim',
+  'hardware issue',
+  'physical damage',
+  'repair',
+];
+
+const startTroubleshootingKeywords = [
+  'yes',
+  'start',
+  'solution',
+  'troubleshoot',
+  'guide me',
+  'continue',
+  'ok',
+  'okay',
+];
+
 function normalize(value: string) {
   return value
     .normalize('NFC')
@@ -122,6 +151,25 @@ function includesKeyword(message: string, keywords: string[]) {
   });
 }
 
+function detectProductFromMessage(message: string) {
+  return products.find((item) => {
+    if (!item.active) return false;
+
+    return [
+      item.productId,
+      item.itemCode || '',
+      item.itemName || '',
+      item.model || '',
+      item.modelFamily || '',
+      item.brand || '',
+    ].some((keyword) => {
+      const normalizedKeyword = normalize(keyword);
+
+      return normalizedKeyword && message.includes(normalizedKeyword);
+    });
+  }) || null;
+}
+
 function categoryMatches(inputCategory: string | undefined, itemCategory: string) {
   if (!inputCategory) return true;
 
@@ -134,10 +182,12 @@ function categoryMatches(inputCategory: string | undefined, itemCategory: string
 function modelMatches(input: ManualSupportInput, solution: ModelSpecificSolutionKnowledge) {
   const productId = normalize(input.productId || '');
   const model = normalize(input.model || '');
+  const messageProduct = detectProductFromMessage(normalize(input.message || ''));
 
   return (
     Boolean(productId && productId === normalize(solution.productId)) ||
-    Boolean(model && model === normalize(solution.model))
+    Boolean(model && (model === normalize(solution.model) || model.includes(normalize(solution.model)))) ||
+    Boolean(messageProduct && normalize(messageProduct.productId) === normalize(solution.productId))
   );
 }
 
@@ -149,20 +199,38 @@ function modelFamilyMatches(input: ManualSupportInput, problem: CommonProblemKno
 }
 
 function getProductCategory(input: ManualSupportInput) {
-  const product = products.find((item) => {
+  const directProduct = products.find((item) => {
     if (!item.active) return false;
 
     return (
       Boolean(input.productId && normalize(input.productId) === normalize(item.productId)) ||
-      Boolean(input.model && normalize(input.model) === normalize(item.model))
+      Boolean(input.model && normalize(input.model).includes(normalize(item.model)))
     );
   });
+  const messageProduct = detectProductFromMessage(normalize(input.message || ''));
+  const product = directProduct || messageProduct;
 
   return product?.category || input.selectedCategory || '';
 }
 
-function formatSolutionMessage(problemName: string) {
-  return `Manual support knowledge found a solution for ${problemName}.`;
+function getDetectedProduct(input: ManualSupportInput) {
+  return products.find((item) => {
+    if (!item.active) return false;
+
+    return (
+      Boolean(input.productId && normalize(input.productId) === normalize(item.productId)) ||
+      Boolean(input.model && normalize(input.model).includes(normalize(item.model)))
+    );
+  }) || detectProductFromMessage(normalize(input.message || ''));
+}
+
+function formatSolutionMessage(problemName: string, explanation?: string, possibleCauses: string[] = []) {
+  const causeText = possibleCauses.length > 0
+    ? ` Possible causes: ${possibleCauses.join(', ')}.`
+    : '';
+  const explanationText = explanation ? `${explanation} ` : '';
+
+  return `${explanationText}${causeText}I found an Excel-approved support flow for ${problemName}. I can guide you step by step. Do you want to start troubleshooting?`.trim();
 }
 
 function escalationMessage(category?: string) {
@@ -174,7 +242,7 @@ function escalationMessage(category?: string) {
   );
 
   return rule?.escalationMessage ||
-    'No verified manual solution was found. Please escalate this issue to human support.';
+    'I do not have an Excel-approved exact solution for this issue yet. I can forward this to human support.';
 }
 
 function matchFollowUp(input: ManualSupportInput, normalizedMessage: string) {
@@ -188,8 +256,44 @@ function matchFollowUp(input: ManualSupportInput, normalizedMessage: string) {
   ) || null;
 }
 
+function matchActiveSolution(input: ManualSupportInput, normalizedMessage: string) {
+  if (!input.activeSolutionId || !includesKeyword(normalizedMessage, startTroubleshootingKeywords)) {
+    return null;
+  }
+
+  const modelSolution = modelSpecificSolutions.find(
+    (item) => item.active && normalize(item.solutionId) === normalize(input.activeSolutionId || '')
+  );
+
+  if (modelSolution) {
+    return {
+      category: getProductCategory(input),
+      problemName: modelSolution.problemName,
+      solutionId: modelSolution.solutionId,
+      solutionSteps: modelSolution.solutionSteps,
+      nextIfNotSolved: modelSolution.nextIfNotSolved,
+    };
+  }
+
+  const commonProblem = commonProblems.find(
+    (item) => item.active && normalize(item.problemId) === normalize(input.activeSolutionId || '')
+  );
+
+  if (!commonProblem) return null;
+
+  return {
+    category: commonProblem.category,
+    problemName: commonProblem.problemName,
+    problemId: commonProblem.problemId,
+    solutionSteps: commonProblem.solutionSteps,
+    nextIfNotSolved: commonProblem.nextIfNotSolved,
+  };
+}
+
 function matchModelSpecificSolution(input: ManualSupportInput, normalizedMessage: string) {
-  if (!input.productId && !input.model) return null;
+  const messageProduct = detectProductFromMessage(normalizedMessage);
+
+  if (!input.productId && !input.model && !messageProduct) return null;
 
   return modelSpecificSolutions.find(
     (item) =>
@@ -214,6 +318,20 @@ function matchCommonProblem(input: ManualSupportInput, normalizedMessage: string
 export function analyzeSupportMessage(input: ManualSupportInput): ManualSupportResult {
   const normalizedMessage = normalize(input.message);
   const category = getProductCategory(input);
+  const detectedProduct = getDetectedProduct(input);
+
+  if (
+    detectedProduct?.requiresSerial &&
+    !input.serialNumber &&
+    includesKeyword(normalizedMessage, warrantyOrReplacementKeywords)
+  ) {
+    return {
+      type: 'question',
+      category: detectedProduct.category,
+      message: 'Warranty details may need to be checked from Excel warranty portal or nearest CSP. If available, please share serial number or invoice details. You can also continue describing the issue.',
+      escalationRequired: false,
+    };
+  }
 
   if (includesKeyword(normalizedMessage, nonSupportKeywords)) {
     return {
@@ -234,6 +352,23 @@ export function analyzeSupportMessage(input: ManualSupportInput): ManualSupportR
       message: followUp.answer,
       escalationRequired: false,
       activeSolutionId: input.activeSolutionId,
+    };
+  }
+
+  const activeSolution = matchActiveSolution(input, normalizedMessage);
+
+  if (activeSolution) {
+    return {
+      type: 'solution',
+      category: activeSolution.category,
+      problemName: activeSolution.problemName,
+      solutionId: activeSolution.solutionId,
+      problemId: activeSolution.problemId,
+      message: `Here are the Excel-approved troubleshooting steps for ${activeSolution.problemName}.`,
+      solutionSteps: activeSolution.solutionSteps,
+      nextIfNotSolved: activeSolution.nextIfNotSolved,
+      escalationRequired: false,
+      activeSolutionId: activeSolution.solutionId || activeSolution.problemId,
     };
   }
 
@@ -261,7 +396,11 @@ export function analyzeSupportMessage(input: ManualSupportInput): ManualSupportR
       category: commonProblem.category,
       problemName: commonProblem.problemName,
       problemId: commonProblem.problemId,
-      message: formatSolutionMessage(commonProblem.problemName),
+      message: formatSolutionMessage(
+        commonProblem.problemName,
+        commonProblem.customerExplanation,
+        commonProblem.possibleCauses
+      ),
       solutionSteps: commonProblem.solutionSteps,
       nextIfNotSolved: commonProblem.nextIfNotSolved,
       escalationRequired: false,

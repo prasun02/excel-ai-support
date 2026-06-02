@@ -1,0 +1,38 @@
+[
+  {
+    "problemId": "ROUTER_INTERNET_INTERNET_AUTO_DISCONNECT_COMMON",
+    "problemName": "Internet Auto Disconnect",
+    "questionOrder": 1,
+    "questionText": "Is the router power light turning off or restarting when the internet disconnects?",
+    "answerType": "choice",
+    "answerOptions": [
+      "Yes",
+      "No",
+      "Not sure"
+    ],
+    "yesNextQuestionOrder": "2",
+    "noNextQuestionOrder": "2",
+    "yesStepGroupCode": "CHECK_ADAPTER",
+    "noStepGroupCode": "",
+    "notSureStepGroupCode": "CHECK_ADAPTER",
+    "active": true
+  },
+  {
+    "problemId": "ROUTER_INTERNET_INTERNET_AUTO_DISCONNECT_COMMON",
+    "problemName": "Internet Auto Disconnect",
+    "questionOrder": 2,
+    "questionText": "Does the issue happen on WiFi only or also with LAN cable?",
+    "answerType": "choice",
+    "answerOptions": [
+      "WiFi only",
+      "LAN also",
+      "Not sure"
+    ],
+    "yesNextQuestionOrder": "3",
+    "noNextQuestionOrder": "3",
+    "yesStepGroupCode": "CHECK_WIFI_INTERFERENCE",
+    "noStepGroupCode": "CHECK_ISP_ONU",
+    "notSureStepGroupCode": "CHECK_ISP_ONU",
+    "active": true
+  }
+]

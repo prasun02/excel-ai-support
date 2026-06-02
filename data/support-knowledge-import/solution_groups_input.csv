@@ -1,0 +1,5 @@
+problemName,stepGroupCode,title,whenToUse,askSolvedAfter,notSolvedNextGroupCode,active
+Internet Auto Disconnect,CHECK_ADAPTER,Check router power adapter,Use if router power light restarts or turns off during disconnect,TRUE,CHECK_ISP_ONU,TRUE
+Internet Auto Disconnect,CHECK_ISP_ONU,Check ISP line and ONU status,Use if router power is stable but internet disconnects,TRUE,CHECK_WIFI_INTERFERENCE,TRUE
+Internet Auto Disconnect,CHECK_FIRMWARE_UPDATE,Router firmware update,Use only after adapter ISP ONU placement and user load checks are OK,TRUE,,TRUE
+Slow Internet,CHECK_SPEED_BASIC,Check basic speed and load,Use when customer reports slow browsing or low speed,TRUE,,TRUE

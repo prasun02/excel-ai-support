@@ -1,0 +1,4 @@
+procedureCode,stepOrder,instruction,expectedResult,troubleshootingIfNotShowing,active
+ARCHER_C6_V4_FW_UPDATE,1,Confirm the router sticker says Archer C6 Ver 4.0 or V4,Correct hardware version confirmed,If version is not V4 do not continue,TRUE
+ARCHER_C6_V4_FW_UPDATE,2,Download the correct Archer C6 V4 firmware file from official source,Firmware file downloaded,If unsure escalate to support,TRUE
+ARCHER_C6_V4_FW_UPDATE,3,Login to router admin panel,Router admin panel opened,If login page is not opening check gateway IP or ask support,TRUE

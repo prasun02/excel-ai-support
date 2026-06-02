@@ -1,0 +1,6 @@
+problemName,stepGroupCode,stepOrder,customerStepText,expectedResult,procedureCode,imageUrl,videoUrl,active
+Internet Auto Disconnect,CHECK_ADAPTER,1,Check whether the router adapter is firmly connected to the power socket and router,Router power light should stay stable,,,,TRUE
+Internet Auto Disconnect,CHECK_ADAPTER,2,If possible test with another compatible same voltage and current adapter,Router should stop restarting if adapter was faulty,,,,TRUE
+Internet Auto Disconnect,CHECK_FIRMWARE_UPDATE,1,Update router firmware only after confirming exact model and hardware version,Firmware update should complete successfully,ARCHER_C6_V4_FW_UPDATE,,,TRUE
+Slow Internet,CHECK_SPEED_BASIC,1,Restart the router and wait 2 minutes,Router should reconnect cleanly,,,,TRUE
+Slow Internet,CHECK_SPEED_BASIC,2,Check if too many devices are connected,Speed should improve after reducing load,,,,TRUE

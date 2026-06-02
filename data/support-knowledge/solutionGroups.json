@@ -1,0 +1,46 @@
+[
+  {
+    "stepGroupId": "ROUTER_INTERNET_INTERNET_AUTO_DISCONNECT_COMMON_CHECK_ADAPTER",
+    "problemId": "ROUTER_INTERNET_INTERNET_AUTO_DISCONNECT_COMMON",
+    "problemName": "Internet Auto Disconnect",
+    "stepGroupCode": "CHECK_ADAPTER",
+    "title": "Check router power adapter",
+    "whenToUse": "Use if router power light restarts or turns off during disconnect",
+    "askSolvedAfter": true,
+    "notSolvedNextGroupCode": "CHECK_ISP_ONU",
+    "active": true
+  },
+  {
+    "stepGroupId": "ROUTER_INTERNET_INTERNET_AUTO_DISCONNECT_COMMON_CHECK_ISP_ONU",
+    "problemId": "ROUTER_INTERNET_INTERNET_AUTO_DISCONNECT_COMMON",
+    "problemName": "Internet Auto Disconnect",
+    "stepGroupCode": "CHECK_ISP_ONU",
+    "title": "Check ISP line and ONU status",
+    "whenToUse": "Use if router power is stable but internet disconnects",
+    "askSolvedAfter": true,
+    "notSolvedNextGroupCode": "CHECK_WIFI_INTERFERENCE",
+    "active": true
+  },
+  {
+    "stepGroupId": "ROUTER_INTERNET_INTERNET_AUTO_DISCONNECT_COMMON_CHECK_FIRMWARE_UPDATE",
+    "problemId": "ROUTER_INTERNET_INTERNET_AUTO_DISCONNECT_COMMON",
+    "problemName": "Internet Auto Disconnect",
+    "stepGroupCode": "CHECK_FIRMWARE_UPDATE",
+    "title": "Router firmware update",
+    "whenToUse": "Use only after adapter ISP ONU placement and user load checks are OK",
+    "askSolvedAfter": true,
+    "notSolvedNextGroupCode": "",
+    "active": true
+  },
+  {
+    "stepGroupId": "ROUTER_INTERNET_SLOW_INTERNET_COMMON_CHECK_SPEED_BASIC",
+    "problemId": "ROUTER_INTERNET_SLOW_INTERNET_COMMON",
+    "problemName": "Slow Internet",
+    "stepGroupCode": "CHECK_SPEED_BASIC",
+    "title": "Check basic speed and load",
+    "whenToUse": "Use when customer reports slow browsing or low speed",
+    "askSolvedAfter": true,
+    "notSolvedNextGroupCode": "",
+    "active": true
+  }
+]

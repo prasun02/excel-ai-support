@@ -1,0 +1,4 @@
+parentType,parentCode,questionKeywords,answer,procedureCode,maxRepeatBeforeEscalation,language,active
+stepGroup,CHECK_FIRMWARE_UPDATE,how update firmware;how to firmware update;firmware process;how do that,Firmware update depends on exact model and hardware version. Please confirm model and hardware version from router sticker.,ARCHER_C6_V4_FW_UPDATE,2,en,TRUE
+procedure,ARCHER_C6_V4_FW_UPDATE,where is hardware version;how find version;version not showing,You can usually find hardware version on the router sticker. It may show as Ver 4.0 or V4.,,2,en,TRUE
+procedure,ARCHER_C6_V4_FW_UPDATE,router login not opening;192.168.0.1 not opening;login page not opening,Please check if your phone or computer is connected to the router WiFi or LAN. Then check the default gateway IP. If still not opening please contact support.,ROUTER_LOGIN_COMMON,2,en,TRUE

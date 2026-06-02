@@ -1,0 +1,5 @@
+category,brand,itemGroup,deviceType,requiresSerial,routerFreeSupport,onlineSupportAllowed,cspSupportAllowed,warrantyRequiredForReplacement,defaultWarrantyMonths,warrantyCheckSource,customerMessage,internalNote,active
+Router / Internet,TP-Link,WIRELESS AC ROUTER,Router,FALSE,TRUE,TRUE,TRUE,FALSE,0,ERP/Warranty Portal,Router support is available online or from nearest Excel CSP. Warranty may be needed only for replacement.,Router support is free. Do not block troubleshooting if warranty data is unavailable.,TRUE
+Printer,Epson,PRINTER,Printer,TRUE,FALSE,TRUE,TRUE,TRUE,12,ERP/Warranty Portal,For printer warranty or hardware issue, serial/invoice may be required for CSP/RMA support.,Check warranty before replacement or RMA.,TRUE
+CCTV,Hikvision,IP CAMERA,IP Camera,TRUE,FALSE,TRUE,TRUE,TRUE,12,ERP/Warranty Portal,For camera hardware or warranty issue, serial/invoice may be required for CSP/RMA support.,Check warranty before replacement or RMA.,TRUE
+UPS,Marsriva,UPS,UPS,TRUE,FALSE,TRUE,TRUE,TRUE,12,ERP/Warranty Portal,For UPS backup or hardware issue, warranty status may be required for replacement/RMA.,Battery/backup issue may depend on policy.,TRUE

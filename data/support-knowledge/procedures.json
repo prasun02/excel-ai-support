@@ -1,0 +1,32 @@
+[
+  {
+    "procedureId": "ARCHER_C6_V4_FW_UPDATE",
+    "procedureCode": "ARCHER_C6_V4_FW_UPDATE",
+    "procedureName": "TP-Link Archer C6 V4 firmware update",
+    "category": "Router / Internet",
+    "brand": "TP-Link",
+    "model": "Archer C6",
+    "hardwareVersion": "V4",
+    "procedureType": "firmware_update",
+    "shortAnswer": "Download exact Archer C6 V4 firmware login to router and upload firmware file",
+    "warning": "Wrong firmware or power loss during update may damage router. If unsure escalate to human support",
+    "imageUrl": "",
+    "videoUrl": "",
+    "active": true
+  },
+  {
+    "procedureId": "ROUTER_LOGIN_COMMON",
+    "procedureCode": "ROUTER_LOGIN_COMMON",
+    "procedureName": "Common router login process",
+    "category": "Router / Internet",
+    "brand": "",
+    "model": "",
+    "hardwareVersion": "",
+    "procedureType": "router_login",
+    "shortAnswer": "Open browser and enter router login IP then login using admin credentials",
+    "warning": "Do not reset router unless instructed by support",
+    "imageUrl": "",
+    "videoUrl": "",
+    "active": true
+  }
+]

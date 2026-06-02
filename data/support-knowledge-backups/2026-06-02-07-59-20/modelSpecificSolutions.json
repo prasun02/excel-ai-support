@@ -18,7 +18,7 @@
     ],
     "nextIfNotSolved": "If the issue is still not solved, I can forward this to human support.",
     "imageUrl": "",
-    "videoUrl": "",
+    "videoUrl": "TRUE",
     "active": true
   }
 ]

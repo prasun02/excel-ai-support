@@ -7,7 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "import:support": "node scripts/import-support-data.mjs"
+    "import:support": "node scripts/import-support-data.mjs",
+    "generate:knowledge": "node --experimental-strip-types scripts/generateKnowledgeFromCsv.ts",
+    "import:products": "node scripts/importProductMaster.js",
+    "analyze:warranty": "node scripts/analyzeWarrantyClaims.js",
+    "generate:knowledge:simple": "node scripts/generateKnowledgeFromSimpleCsv.js",
+    "generate:knowledge:all": "node scripts/generateAllKnowledge.js"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.60",
