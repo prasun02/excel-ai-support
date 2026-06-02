@@ -1,0 +1,26 @@
+[
+  {
+    "solutionId": "ARCHER_C6_SLOW_001",
+    "productId": "TP_LINK_ARCHER_C6",
+    "model": "Archer C6",
+    "problemName": "Slow Internet",
+    "symptoms": [
+      "archer c6 slow",
+      "net slow",
+      "wifi slow",
+      "speed low",
+      "internet slow"
+    ],
+    "solutionSteps": [
+      "Restart Archer C6 router.",
+      "Check WAN cable connection.",
+      "Login to the router admin panel and check connected devices.",
+      "Change Wi-Fi channel to Auto.",
+      "Test speed near the router."
+    ],
+    "nextIfNotSolved": "If the issue is still not solved, I can forward this to human support.",
+    "imageUrl": "",
+    "videoUrl": "",
+    "active": true
+  }
+]

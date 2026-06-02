@@ -1,56 +1,48 @@
-# Support Knowledge Import Template
+# Simple Support Knowledge Import
 
-`support_knowledge_template.csv` is a starter file for maintaining real Excel support solutions in Excel or Google Sheets.
-
-## How to Edit
-
-- Keep the header row unchanged.
-- Use `|` between multiple keywords, questions, or solution steps.
-- Set `active` to `true` for usable support answers and `false` for drafts.
-- Keep solutions short and practical because customers see these during chat.
+Use `public/templates/simple_support_knowledge_template.csv` when a support engineer wants to add real model-wise problems and solutions. The file is intentionally short so it can be edited in Excel or Google Sheets without technical knowledge.
 
 ## Columns
 
-- `category`: Support category shown in the app.
-- `intent`: Stable machine-friendly name, such as `slow_internet`.
-- `issueType`: Human-friendly issue name, such as `Slow Internet`.
-- `englishKeywords`, `banglaKeywords`, `banglishKeywords`, `misspellings`: Matching terms.
-- `diagnosticQuestions`: Questions asked one by one before solution.
-- `solutionSteps`: Real support steps shown to customer.
-- `followUpQuestion`: Usually `Did this solve your problem?`.
-- `escalationMessage`: Human support message when the app cannot solve it.
-- `priority`: `high`, `medium`, or `low`.
-- `active`: `true` or `false`.
+- `category`: Router / Internet, Camera / DVR / NVR, Printer, UPS / Inverter, Warranty, New Product Purchase, Other Product.
+- `brand`: Product brand, for example TP-Link, Hikvision, Logitech, HP, Excel.
+- `model`: Exact model such as Archer C6. This is optional.
+- `modelFamily`: Product series or family such as Archer, WR Series, DVR, NVR, UPS. This is optional.
+- `problem`: Short issue name such as Slow Internet, Camera Offline, Not Printing.
+- `symptoms`: Customer words separated with `|`, for example `slow net|buffering|net hanging|wifi slow`.
+- `solutionSteps`: Customer-facing solution steps separated with `|`.
+- `nextIfNotSolved`: Second-level action if the first solution does not work.
+- `escalationMessage`: Human support message when the app cannot solve the issue.
+- `imageUrl`: Optional image guide link.
+- `videoUrl`: Optional video guide link.
+- `active`: Use `true` for live answers and `false` for drafts.
 
-## Current Import Flow
+## How Matching Works
 
-The app currently loads JSON data at runtime for fast Vercel deployment. The helper in `lib/importSupportData.ts` shows how a CSV row can be converted into the same JSON-like structure. Later, an admin import button or script can read this CSV and generate/update JSON or Supabase rows.
+The app converts each CSV row into an internal support knowledge object. It then searches in this order:
 
-## Model-Wise Support Knowledge Template
+1. Uploaded/imported simple CSV knowledge from the admin page.
+2. Supabase knowledge when available in a future deployment.
+3. Local browser imported knowledge.
+4. Default JSON knowledge bundled with the app.
+5. Human escalation fallback.
 
-Use `public/templates/model_wise_support_knowledge_template.csv` for future model-wise real service solutions. Keep the header row unchanged and separate multiple keywords, questions, or steps with `|`.
+Matching priority:
 
-- `category`: Router / Internet, Camera / DVR / NVR, Printer, UPS / Inverter, Warranty, New Product Purchase.
-- `brand`: Product brand, for example TP-Link, Hikvision, Logitech, Excel.
-- `productModel`: Exact model name such as Archer C6 or DS-2CE.
-- `modelFamily`: Similar model group, such as Archer, Turbo HD, or UPS.
-- `deviceType`: Device type, such as router, camera, NVR, printer, UPS.
-- `issueType`: Support issue, such as Slow Internet, No Display, No Backup.
-- `problemKeywords`: English customer problem words.
-- `banglaKeywords`: Bangla customer problem words.
-- `banglishKeywords`: Banglish customer problem words.
-- `misspellings`: Common spelling mistakes.
-- `customerSymptomExample`: Sample customer language.
-- `diagnosticQuestions`: Questions to ask before giving solution.
-- `solutionSteps`: Real service solution steps.
-- `repairImageUrl`: Optional image guide link.
-- `repairVideoUrl`: Optional video guide link.
-- `riskAfterSolution`: Possible risk after applying solution.
-- `nextPossibleProblem`: What may happen if first solution fails.
-- `nextSolutionSteps`: Second-level solution steps.
-- `whenToEscalate`: Condition for human support.
-- `escalationMessage`: Final human support message.
-- `priority`: `high`, `medium`, or `low`.
-- `active`: `true` or `false`.
+1. Same exact model plus matching symptom/problem.
+2. Same model family plus matching symptom/problem.
+3. Same category plus matching symptom/problem.
+4. If the issue is unclear, the app asks for clarification.
+5. If no real solution exists, it escalates to human support.
 
-Future flow: imported Supabase knowledge can be checked first, uploaded local knowledge second, default JSON/model-wise knowledge third, then the app falls back to human escalation.
+## Editing Rules
+
+- Keep the header row unchanged.
+- Separate multiple symptoms and solution steps with `|`.
+- Keep solutions short, practical, and safe for customers.
+- Do not add invented answers. Real solutions should come from Excel service knowledge.
+- Add common customer language, Banglish, and misspellings in `symptoms`.
+
+## Optional AI Later
+
+`OPENAI_API_KEY`, `GEMINI_API_KEY`, and `AI_PROVIDER` can be added later. AI is used only for intent matching, meaning it can help classify the customer's category/problem. AI must not invent a solution. The manual CSV/JSON knowledge base remains the source of truth for all answers.

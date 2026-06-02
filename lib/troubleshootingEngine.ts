@@ -13,10 +13,19 @@ import {
   noExactSolutionReply,
   nonSupportReply,
 } from '@/lib/languageUnderstanding';
-import { findModelWiseSolution } from '@/lib/modelWiseKnowledge';
+import {
+  findSimpleKnowledgeMatch,
+  simpleKnowledgeToFlow,
+} from '@/lib/simpleKnowledgeImport';
+import {
+  findModelWiseSolution,
+  getDefaultSimpleSupportKnowledge,
+} from '@/lib/modelWiseKnowledge';
 import type {
+  AiIntentMatch,
   LocalSupportTicket,
   ReplyLanguage,
+  SimpleSupportKnowledgeItem,
   SolvedStatus,
   TroubleshootingFlow,
 } from '@/types/support';
@@ -47,6 +56,8 @@ type TroubleshootingInput = {
   selectedCategory?: string;
   ticketState?: Partial<LocalSupportTicket>;
   language?: ReplyLanguage;
+  importedSimpleKnowledge?: SimpleSupportKnowledgeItem[];
+  aiIntent?: AiIntentMatch | null;
 };
 
 type TroubleshootingOutput = {
@@ -194,9 +205,18 @@ function questionReply(flow: TroubleshootingFlow, question: string, language: Re
   return language === 'bn' ? `${prefix}${'\u09ad\u09be\u09b2\u09cb\u09ad\u09be\u09ac\u09c7 \u09ac\u09c1\u099d\u09a4\u09c7 \u0985\u09a8\u09c1\u0997\u09cd\u09b0\u09b9 \u0995\u09b0\u09c7 \u0989\u09a4\u09cd\u09a4\u09b0 \u09a6\u09bf\u09a8:'}\n${question}` : `${prefix}To understand better, please answer:\n${question}`;
 }
 
-function solutionReply(flow: TroubleshootingFlow, language: ReplyLanguage, ticketState?: Partial<LocalSupportTicket>) {
+function solutionReply(
+  flow: TroubleshootingFlow,
+  language: ReplyLanguage,
+  ticketState?: Partial<LocalSupportTicket>,
+  importedSimpleKnowledge: SimpleSupportKnowledgeItem[] = []
+) {
   const modelSolution = findModelWiseSolution({
-    category: flow.category, issueType: flow.issueType, productModel: ticketState?.productModel || '', message: ticketState?.issue || '',
+    category: flow.category,
+    issueType: flow.issueType,
+    productModel: ticketState?.productModel || '',
+    message: ticketState?.issue || '',
+    importedSimpleKnowledge,
   });
   const solutionSteps = modelSolution?.solutionSteps?.length ? modelSolution.solutionSteps : flow.solutionSteps;
   const steps = solutionSteps.map((step, index) => `${index + 1}. ${step}`).join('\n');
@@ -303,7 +323,20 @@ function result(
 
 export function getNextTroubleshootingResponse(input: TroubleshootingInput): TroubleshootingOutput {
   const language = input.language || detectLanguage(input.message);
-  const analysis = analyzeSupportMessage(input.message);
+  const baseAnalysis = analyzeSupportMessage(input.message);
+  const analysis = input.aiIntent && input.aiIntent.confidence >= 0.65
+    ? {
+        ...baseAnalysis,
+        category: input.aiIntent.category || baseAnalysis.category,
+        issueType: input.aiIntent.problem || baseAnalysis.issueType,
+        matchedKeywords: input.aiIntent.matchedKeywords,
+        isSupportRelated: true,
+      }
+    : baseAnalysis;
+  const simpleKnowledge = [
+    ...(input.importedSimpleKnowledge || []),
+    ...getDefaultSimpleSupportKnowledge(),
+  ];
   let ticketState = input.ticketState || {};
 
   if (ticketState.escalationCompleted) {
@@ -451,8 +484,16 @@ export function getNextTroubleshootingResponse(input: TroubleshootingInput): Tro
           normalizeText(flow.issueType) === normalizeText(analysis.issueType)
       )
     : undefined;
+  const simpleMatch = findSimpleKnowledgeMatch({
+    category: selectedCategory,
+    problem: analysis.issueType,
+    productModel: ticketState.productModel || '',
+    message: input.message,
+    knowledge: simpleKnowledge,
+  });
+  const simpleFlow = simpleMatch ? simpleKnowledgeToFlow(simpleMatch.item) : undefined;
 
-  if (!existingFlow && analysis.issueType && !exactFlow) {
+  if (!existingFlow && analysis.issueType && !exactFlow && !simpleFlow) {
     return {
       responseText: noExactSolutionReply(language),
       updatedTicketState: {
@@ -481,7 +522,9 @@ export function getNextTroubleshootingResponse(input: TroubleshootingInput): Tro
     ? { flow: existingFlow, matched: true }
     : exactFlow
       ? { flow: exactFlow, matched: true }
-      : findBestFlow(input.message, selectedCategory);
+      : simpleFlow
+        ? { flow: simpleFlow, matched: true }
+        : findBestFlow(input.message, selectedCategory);
 
   if (!existingFlow && !match.matched) {
     const responseText = analysis.isSupportRelated && analysis.issueType
@@ -599,6 +642,16 @@ export function getNextTroubleshootingResponse(input: TroubleshootingInput): Tro
   if (currentQuestionIndex === 0) {
     const firstQuestion = flow.questions[0];
 
+    if (!firstQuestion) {
+      return result(
+        flow,
+        solutionReply(flow, language, ticketState, input.importedSimpleKnowledge),
+        buildContext(flow, currentQuestionIndex, askedQuestions, userAnswers, true, 'pending'),
+        language,
+        match.matched
+      );
+    }
+
     return result(
       flow,
       questionReply(flow, firstQuestion, language, true),
@@ -631,7 +684,7 @@ export function getNextTroubleshootingResponse(input: TroubleshootingInput): Tro
 
   return result(
     flow,
-    solutionReply(flow, language, ticketState),
+    solutionReply(flow, language, ticketState, input.importedSimpleKnowledge),
     buildContext(flow, currentQuestionIndex, askedQuestions, nextAnswers, true, 'pending'),
     language,
     true

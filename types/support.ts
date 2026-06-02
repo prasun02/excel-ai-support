@@ -118,6 +118,34 @@ export type ModelWiseSupportKnowledgeItem = {
   active: boolean;
 };
 
+export type SimpleSupportKnowledgeItem = {
+  category: string;
+  brand: string;
+  model: string;
+  modelFamily: string;
+  problem: string;
+  symptoms: string[];
+  solutionSteps: string[];
+  nextIfNotSolved: string;
+  escalationMessage: string;
+  imageUrl: string;
+  videoUrl: string;
+  active: boolean;
+};
+
+export type SimpleKnowledgeMatch = {
+  item: SimpleSupportKnowledgeItem;
+  score: number;
+  matchLevel: 'model' | 'modelFamily' | 'category';
+};
+
+export type AiIntentMatch = {
+  category: string;
+  problem: string;
+  confidence: number;
+  matchedKeywords: string[];
+};
+
 export type SupportMatch = {
   matched: boolean;
   category: string;

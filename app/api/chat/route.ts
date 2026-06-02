@@ -1,5 +1,6 @@
+import { matchIntentWithOptionalAi } from '@/lib/aiIntentMatcher';
 import { getNextTroubleshootingResponse } from '@/lib/troubleshootingEngine';
-import type { ChatApiResponse, LocalSupportTicket } from '@/types/support';
+import type { ChatApiResponse, LocalSupportTicket, SimpleSupportKnowledgeItem } from '@/types/support';
 import { generateTicketId } from '@/utils/ticket';
 
 type ChatMessage = {
@@ -13,6 +14,9 @@ export async function POST(req: Request) {
   const latestMessage = messages[messages.length - 1]?.content || '';
   const categoryHint = typeof body.category === 'string' ? body.category.trim() : '';
   const ticketContext = (body.ticketContext || {}) as Partial<LocalSupportTicket>;
+  const importedSimpleKnowledge = Array.isArray(body.importedSimpleKnowledge)
+    ? (body.importedSimpleKnowledge as SimpleSupportKnowledgeItem[])
+    : [];
 
   // Reuse a ticket if the browser already has one; otherwise create a demo ticket ID.
   const ticketId =
@@ -20,10 +24,18 @@ export async function POST(req: Request) {
       ? body.ticketId.trim()
       : generateTicketId();
 
+  const aiIntent = await matchIntentWithOptionalAi({
+    message: latestMessage,
+    selectedCategory: categoryHint,
+    productModel: ticketContext.productModel || '',
+  });
+
   const result = getNextTroubleshootingResponse({
     message: latestMessage,
     selectedCategory: categoryHint,
     ticketState: ticketContext,
+    importedSimpleKnowledge,
+    aiIntent,
   });
 
   return Response.json({

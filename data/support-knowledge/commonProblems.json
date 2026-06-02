@@ -1,0 +1,24 @@
+[
+  {
+    "problemId": "ROUTER_SLOW_COMMON",
+    "category": "Router",
+    "modelFamily": "General",
+    "problemName": "Slow Internet",
+    "symptoms": [
+      "net slow",
+      "internet slow",
+      "wifi slow",
+      "speed low",
+      "browsing slow"
+    ],
+    "solutionSteps": [
+      "Restart the router and wait 2 minutes.",
+      "Check if too many devices are connected.",
+      "Place the router in an open area.",
+      "Test internet speed using LAN cable if possible.",
+      "Contact ISP if WAN speed is also low."
+    ],
+    "nextIfNotSolved": "Please check the steps above and tell me if the issue is solved.",
+    "active": true
+  }
+]

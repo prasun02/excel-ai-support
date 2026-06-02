@@ -21,6 +21,7 @@ import {
   nonSupportReply,
 } from '@/lib/languageUnderstanding';
 import { bn } from '@/lib/i18n';
+import { simpleCsvRowToKnowledge, type SimpleSupportCsvRow } from '@/lib/simpleKnowledgeImport';
 import { isProductInfoSkip, parseProductInfo } from '@/lib/productInfoParser';
 import {
   appendMessagesToTicket,
@@ -31,7 +32,13 @@ import {
   saveActiveCategory,
   upsertTicket,
 } from '@/lib/ticketStorage';
-import type { ChatApiResponse, LocalSupportTicket, ReplyLanguage, SupportChatMessage } from '@/types/support';
+import type {
+  ChatApiResponse,
+  LocalSupportTicket,
+  ReplyLanguage,
+  SimpleSupportKnowledgeItem,
+  SupportChatMessage,
+} from '@/types/support';
 import { detectLanguage, hasBangla } from '@/utils/text';
 import { generateTicketId } from '@/utils/ticket';
 
@@ -115,6 +122,8 @@ const categoryAliases: Record<string, string> = {
   general: 'General',
   support: 'General',
 };
+
+const SIMPLE_KNOWLEDGE_KEY = 'simpleSupportKnowledge';
 
 function getThemeSnapshot() {
   if (typeof window === 'undefined') {
@@ -245,6 +254,19 @@ function productInfoSkippedMessage(language: ReplyLanguage) {
   return language === 'bn'
     ? bn.writeIssue
     : 'No problem. Please write or tell your issue now.';
+}
+
+function loadImportedSimpleKnowledge(): SimpleSupportKnowledgeItem[] {
+  if (typeof window === 'undefined') return [];
+
+  try {
+    const savedRows = window.localStorage.getItem(SIMPLE_KNOWLEDGE_KEY);
+    const rows = savedRows ? (JSON.parse(savedRows) as SimpleSupportCsvRow[]) : [];
+
+    return rows.map(simpleCsvRowToKnowledge).filter((item) => item.active);
+  } catch {
+    return [];
+  }
 }
 
 function createTicketFromApiResponse(
@@ -484,6 +506,7 @@ export default function ChatPage() {
         category: preferredCategory,
         ticketId: ticket?.ticketId,
         ticketContext: ticket,
+        importedSimpleKnowledge: loadImportedSimpleKnowledge(),
         requesterName,
         requesterContact,
       }),

@@ -30,6 +30,16 @@ This project is a professional internal AI support management prototype for **Ex
 
 ### Add New Support Knowledge
 
+For the current MVP, the easiest path is the simplified CSV template:
+
+- Download: `public/templates/simple_support_knowledge_template.csv`
+- Admin upload page: `/admin/knowledge`
+- Separate symptoms with `|`
+- Separate solution steps with `|`
+- Keep `active` as `true` when the answer is ready for customers
+
+The simplified CSV supports model-wise matching. If a customer gives a model such as `Archer C6`, the app first looks for that exact model. If no exact model answer exists, it checks the model family, then the category/problem, and finally falls back to the default guided troubleshooting JSON. Optional OpenAI/Gemini keys can later improve intent matching only; the app must still use manual CSV/JSON knowledge for the final solution.
+
 Support knowledge is stored in JSON files inside the `data/` folder:
 
 - `data/router.json`
