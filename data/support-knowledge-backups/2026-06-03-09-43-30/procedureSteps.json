@@ -1,0 +1,29 @@
+[
+  {
+    "procedureId": "ARCHER_C6_V4_FW_UPDATE",
+    "procedureCode": "ARCHER_C6_V4_FW_UPDATE",
+    "stepOrder": 1,
+    "instruction": "Confirm the router sticker says Archer C6 Ver 4.0 or V4",
+    "expectedResult": "Correct hardware version confirmed",
+    "troubleshootingIfNotShowing": "If version is not V4 do not continue",
+    "active": true
+  },
+  {
+    "procedureId": "ARCHER_C6_V4_FW_UPDATE",
+    "procedureCode": "ARCHER_C6_V4_FW_UPDATE",
+    "stepOrder": 2,
+    "instruction": "Download the correct Archer C6 V4 firmware file from official source",
+    "expectedResult": "Firmware file downloaded",
+    "troubleshootingIfNotShowing": "If unsure escalate to support",
+    "active": true
+  },
+  {
+    "procedureId": "ARCHER_C6_V4_FW_UPDATE",
+    "procedureCode": "ARCHER_C6_V4_FW_UPDATE",
+    "stepOrder": 3,
+    "instruction": "Login to router admin panel",
+    "expectedResult": "Router admin panel opened",
+    "troubleshootingIfNotShowing": "If login page is not opening check gateway IP or ask support",
+    "active": true
+  }
+]

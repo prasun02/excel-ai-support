@@ -12,6 +12,7 @@
     "import:products": "node scripts/importProductMaster.js",
     "analyze:warranty": "node scripts/analyzeWarrantyClaims.js",
     "generate:knowledge:simple": "node scripts/generateKnowledgeFromSimpleCsv.js",
+    "generate:knowledge:cases": "node scripts/generateKnowledgeFromSupportCases.js",
     "generate:knowledge:all": "node scripts/generateAllKnowledge.js"
   },
   "dependencies": {

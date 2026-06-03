@@ -6,6 +6,7 @@ const scripts = [
   'importProductMaster.js',
   'analyzeWarrantyClaims.js',
   'generateKnowledgeFromSimpleCsv.js',
+  'generateKnowledgeFromSupportCases.js',
 ];
 
 for (const script of scripts) {

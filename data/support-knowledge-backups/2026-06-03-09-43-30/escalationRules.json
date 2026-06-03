@@ -1,0 +1,9 @@
+[
+  {
+    "category": "Router / Internet",
+    "condition": "not_solved",
+    "escalationMessage": "Thank you. Please contact your nearest Excel Customer Support Point directly for further support. You may visit the service center physically with your device if needed. If you have any other support issue or query please write it.",
+    "askLocationFirst": true,
+    "active": true
+  }
+]

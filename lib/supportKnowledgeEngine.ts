@@ -2,6 +2,8 @@ import commonProblemsData from '@/data/support-knowledge/commonProblems.json';
 import escalationRulesData from '@/data/support-knowledge/escalationRules.json';
 import followUpQuestionsData from '@/data/support-knowledge/followUpQuestions.json';
 import modelSpecificSolutionsData from '@/data/support-knowledge/modelSpecificSolutions.json';
+import procedureStepsData from '@/data/support-knowledge/procedureSteps.json';
+import proceduresData from '@/data/support-knowledge/procedures.json';
 import productsData from '@/data/support-knowledge/products.json';
 
 type ProductKnowledge = {
@@ -15,6 +17,9 @@ type ProductKnowledge = {
   modelFamily: string;
   deviceType: string;
   requiresSerial?: boolean;
+  requiresModel?: boolean;
+  requiresHardwareVersion?: boolean;
+  hardwareVersions?: string[];
   active: boolean;
 };
 
@@ -27,6 +32,15 @@ type CommonProblemKnowledge = {
   possibleCauses?: string[];
   customerExplanation?: string;
   solutionSteps: string[];
+  safeCustomerChecks?: string[];
+  requiresModel?: boolean;
+  requiresHardwareVersion?: boolean;
+  requiresSerial?: boolean;
+  requiresStickerPhoto?: boolean;
+  firmwareRequired?: boolean;
+  firmwareWarning?: string;
+  routerFreeSupport?: boolean;
+  riskLevel?: string;
   nextIfNotSolved: string;
   active: boolean;
 };
@@ -37,7 +51,19 @@ type ModelSpecificSolutionKnowledge = {
   model: string;
   problemName: string;
   symptoms: string[];
+  possibleCauses?: string[];
+  safeCustomerChecks?: string[];
   solutionSteps: string[];
+  internalTechnicianSteps?: string[];
+  procedureId?: string;
+  riskLevel?: string;
+  requiresModel?: boolean;
+  requiresHardwareVersion?: boolean;
+  requiresSerial?: boolean;
+  requiresStickerPhoto?: boolean;
+  firmwareRequired?: boolean;
+  firmwareWarning?: string;
+  routerFreeSupport?: boolean;
   nextIfNotSolved: string;
   imageUrl: string;
   videoUrl: string;
@@ -59,12 +85,39 @@ type EscalationRuleKnowledge = {
   active: boolean;
 };
 
+type ProcedureKnowledge = {
+  procedureId: string;
+  procedureCode: string;
+  procedureName: string;
+  category: string;
+  brand: string;
+  model: string;
+  hardwareVersion: string;
+  procedureType: string;
+  shortAnswer: string;
+  warning: string;
+  imageUrl: string;
+  videoUrl: string;
+  active: boolean;
+};
+
+type ProcedureStepKnowledge = {
+  procedureId: string;
+  procedureCode: string;
+  stepOrder: number;
+  instruction: string;
+  expectedResult: string;
+  troubleshootingIfNotShowing: string;
+  active: boolean;
+};
+
 export type ManualSupportInput = {
   message: string;
   selectedCategory?: string;
   model?: string;
   productId?: string;
   modelFamily?: string;
+  hardwareVersion?: string;
   activeSolutionId?: string;
   lastProblemName?: string;
   serialNumber?: string;
@@ -88,6 +141,10 @@ const commonProblems = commonProblemsData as CommonProblemKnowledge[];
 const modelSpecificSolutions = modelSpecificSolutionsData as ModelSpecificSolutionKnowledge[];
 const followUpQuestions = followUpQuestionsData as FollowUpQuestionKnowledge[];
 const escalationRules = escalationRulesData as EscalationRuleKnowledge[];
+const procedures = proceduresData as ProcedureKnowledge[];
+const procedureSteps = procedureStepsData as ProcedureStepKnowledge[];
+const FIRMWARE_WARNING =
+  'Firmware update must match exact model and hardware version. Wrong firmware or power loss during update may damage router. If you are unsure, please visit Excel CSP.';
 
 const nonSupportKeywords = [
   'poem',
@@ -110,6 +167,10 @@ const notSolvedKeywords = [
   'no solution',
   'issue remains',
   'problem remains',
+  'kaj hoy nai',
+  'ekhono problem',
+  'সমাধান হয়নি',
+  'এখনো সমস্যা',
 ];
 
 const warrantyOrReplacementKeywords = [
@@ -132,6 +193,30 @@ const startTroubleshootingKeywords = [
   'continue',
   'ok',
   'okay',
+  'step',
+  'steps',
+  'guide',
+  'guide me',
+  'how',
+  'how to',
+  'firmware',
+  'update',
+];
+
+const procedureKeywords = [
+  'procedure',
+  'step by step',
+  'firmware',
+  'update',
+  'upgrade',
+  'how',
+  'how to',
+  'configure',
+  'configuration',
+  'pppoe',
+  'dynamic ip',
+  'router page',
+  '192.168',
 ];
 
 function normalize(value: string) {
@@ -149,6 +234,55 @@ function includesKeyword(message: string, keywords: string[]) {
 
     return normalizedKeyword && message.includes(normalizedKeyword);
   });
+}
+
+function keywordScore(message: string, keywords: string[]) {
+  return keywords.reduce((total, keyword) => {
+    const normalizedKeyword = normalize(keyword);
+
+    if (!normalizedKeyword) return total;
+    if (message.includes(normalizedKeyword)) return total + Math.max(3, normalizedKeyword.length);
+
+    const wordMatches = normalizedKeyword
+      .split(' ')
+      .filter((word) => word.length > 2 && message.includes(word)).length;
+
+    return total + wordMatches;
+  }, 0);
+}
+
+function isRouterCategory(category?: string) {
+  return normalize(category || '').includes('router') || normalize(category || '').includes('internet');
+}
+
+function isProcedureRequest(message: string) {
+  return includesKeyword(message, procedureKeywords);
+}
+
+function routerInfoGuidance(message: string) {
+  const normalized = normalize(message);
+
+  if (/(deco|mesh)/.test(normalized)) {
+    return 'Deco series usually uses the Deco app for setup/update. Please share exact Deco model if you need model-specific guidance.';
+  }
+
+  if (/(sim|4g|lte|gp|grameenphone|banglalink|robi|airtel|teletalk|apn)/.test(normalized)) {
+    return 'SIM/4G router may need APN configuration based on operator such as Grameenphone or Banglalink. Please share exact router model and SIM operator. I will not guess exact APN unless it is added in manual knowledge.';
+  }
+
+  if (/(mercusys|192\.168\.1\.1)/.test(normalized)) {
+    return 'Mercusys routers usually use 192.168.1.1. IP may vary by configuration. If it does not open, check default gateway.';
+  }
+
+  if (/(tp-link|tplink|192\.168\.0\.1|router page|login ip)/.test(normalized)) {
+    return 'For TP-Link routers usually open 192.168.0.1 after connecting to the router. IP may vary by configuration. If it does not open, check default gateway.';
+  }
+
+  if (/(mobile|phone)/.test(normalized)) {
+    return 'Some router pages can open by mobile using default WiFi/SSID from sticker, but firmware update is safer by PC.';
+  }
+
+  return '';
 }
 
 function detectProductFromMessage(message: string) {
@@ -224,13 +358,21 @@ function getDetectedProduct(input: ManualSupportInput) {
   }) || detectProductFromMessage(normalize(input.message || ''));
 }
 
-function formatSolutionMessage(problemName: string, explanation?: string, possibleCauses: string[] = []) {
+function formatSolutionMessage(
+  problemName: string,
+  explanation?: string,
+  possibleCauses: string[] = [],
+  safeChecks: string[] = []
+) {
   const causeText = possibleCauses.length > 0
-    ? ` Possible causes: ${possibleCauses.join(', ')}.`
+    ? `\n\nPossible causes:\n${possibleCauses.map((cause, index) => `${index + 1}. ${cause}`).join('\n')}`
+    : '';
+  const safeCheckText = safeChecks.length > 0
+    ? `\n\nSafe checks you can try first:\n${safeChecks.map((check, index) => `${index + 1}. ${check}`).join('\n')}`
     : '';
   const explanationText = explanation ? `${explanation} ` : '';
 
-  return `${explanationText}${causeText}I found an Excel-approved support flow for ${problemName}. I can guide you step by step. Do you want to start troubleshooting?`.trim();
+  return `${explanationText}${causeText}${safeCheckText}\n\nI found an Excel-approved support flow for ${problemName}. I can guide you with safe checks first. Do you want step-by-step guidance?`.trim();
 }
 
 function escalationMessage(category?: string) {
@@ -248,12 +390,49 @@ function escalationMessage(category?: string) {
 function matchFollowUp(input: ManualSupportInput, normalizedMessage: string) {
   if (!input.activeSolutionId) return null;
 
+  const explicitRouterGuidance = routerInfoGuidance(normalizedMessage);
+  if (explicitRouterGuidance && isRouterCategory(input.selectedCategory)) {
+    return {
+      parentSolutionId: input.activeSolutionId,
+      questionKeywords: [],
+      answer: explicitRouterGuidance,
+      language: 'en',
+      active: true,
+    };
+  }
+
   return followUpQuestions.find(
     (item) =>
       item.active &&
       normalize(item.parentSolutionId) === normalize(input.activeSolutionId || '') &&
       includesKeyword(normalizedMessage, item.questionKeywords)
   ) || null;
+}
+
+function formatProcedureAnswer(solution: ModelSpecificSolutionKnowledge) {
+  if (!solution.procedureId) return null;
+
+  const procedure = procedures.find(
+    (item) =>
+      item.active &&
+      (normalize(item.procedureId) === normalize(solution.procedureId || '') ||
+        normalize(item.procedureCode) === normalize(solution.procedureId || ''))
+  );
+  const steps = procedureSteps
+    .filter(
+      (item) =>
+        item.active &&
+        (normalize(item.procedureId) === normalize(solution.procedureId || '') ||
+          normalize(item.procedureCode) === normalize(solution.procedureId || ''))
+    )
+    .sort((left, right) => left.stepOrder - right.stepOrder);
+
+  if (!procedure || steps.length === 0) return null;
+
+  const warning = solution.firmwareRequired ? FIRMWARE_WARNING : procedure.warning;
+  const stepText = steps.map((step) => `${step.stepOrder}. ${step.instruction}`).join('\n');
+
+  return `${warning}\n\nApproved procedure: ${procedure.procedureName}\n\n${stepText}`;
 }
 
 function matchActiveSolution(input: ManualSupportInput, normalizedMessage: string) {
@@ -266,12 +445,17 @@ function matchActiveSolution(input: ManualSupportInput, normalizedMessage: strin
   );
 
   if (modelSolution) {
+    const procedureAnswer = isProcedureRequest(normalizedMessage)
+      ? formatProcedureAnswer(modelSolution)
+      : null;
+
     return {
       category: getProductCategory(input),
       problemName: modelSolution.problemName,
       solutionId: modelSolution.solutionId,
-      solutionSteps: modelSolution.solutionSteps,
+      solutionSteps: procedureAnswer ? [procedureAnswer] : modelSolution.solutionSteps,
       nextIfNotSolved: modelSolution.nextIfNotSolved,
+      procedureAnswer: Boolean(procedureAnswer),
     };
   }
 
@@ -295,24 +479,34 @@ function matchModelSpecificSolution(input: ManualSupportInput, normalizedMessage
 
   if (!input.productId && !input.model && !messageProduct) return null;
 
-  return modelSpecificSolutions.find(
-    (item) =>
-      item.active &&
-      modelMatches(input, item) &&
-      includesKeyword(normalizedMessage, item.symptoms)
-  ) || null;
+  return modelSpecificSolutions
+    .filter((item) => item.active && modelMatches(input, item))
+    .map((item) => ({
+      item,
+      score:
+        keywordScore(normalizedMessage, item.symptoms) +
+        (item.requiresModel ? 5 : 0) +
+        (item.firmwareRequired ? 3 : 0),
+    }))
+    .filter(({ score }) => score > 0)
+    .sort((left, right) => right.score - left.score)[0]?.item || null;
 }
 
 function matchCommonProblem(input: ManualSupportInput, normalizedMessage: string) {
   const category = getProductCategory(input);
 
-  return commonProblems.find(
-    (item) =>
-      item.active &&
-      categoryMatches(category, item.category) &&
-      modelFamilyMatches(input, item) &&
-      includesKeyword(normalizedMessage, item.symptoms)
-  ) || null;
+  return commonProblems
+    .filter((item) => item.active && categoryMatches(category, item.category) && modelFamilyMatches(input, item))
+    .map((item) => ({
+      item,
+      score:
+        keywordScore(normalizedMessage, item.symptoms) +
+        (item.requiresModel ? 5 : 0) +
+        (item.firmwareRequired ? 3 : 0) +
+        (item.safeCustomerChecks?.length ? 2 : 0),
+    }))
+    .filter(({ score }) => score > 0)
+    .sort((left, right) => right.score - left.score)[0]?.item || null;
 }
 
 export function analyzeSupportMessage(input: ManualSupportInput): ManualSupportResult {
@@ -364,7 +558,9 @@ export function analyzeSupportMessage(input: ManualSupportInput): ManualSupportR
       problemName: activeSolution.problemName,
       solutionId: activeSolution.solutionId,
       problemId: activeSolution.problemId,
-      message: `Here are the Excel-approved troubleshooting steps for ${activeSolution.problemName}.`,
+      message: activeSolution.procedureAnswer
+        ? `Here is the approved procedure for ${activeSolution.problemName}.`
+        : `Here are the Excel-approved safe troubleshooting steps for ${activeSolution.problemName}.`,
       solutionSteps: activeSolution.solutionSteps,
       nextIfNotSolved: activeSolution.nextIfNotSolved,
       escalationRequired: false,
@@ -375,12 +571,33 @@ export function analyzeSupportMessage(input: ManualSupportInput): ManualSupportR
   const modelSpecificSolution = matchModelSpecificSolution(input, normalizedMessage);
 
   if (modelSpecificSolution) {
+    if (
+      isRouterCategory(category || modelSpecificSolution.problemName) &&
+      (modelSpecificSolution.requiresModel || modelSpecificSolution.requiresHardwareVersion || modelSpecificSolution.requiresStickerPhoto) &&
+      !input.model
+    ) {
+      return {
+        type: 'question',
+        category: category || 'Router / Internet',
+        problemName: modelSpecificSolution.problemName,
+        solutionId: modelSpecificSolution.solutionId,
+        message: 'Please share your router model or upload a clear photo of the backside sticker. You can also write the model manually, for example: TL-WR845N Ver 4.',
+        escalationRequired: false,
+        activeSolutionId: modelSpecificSolution.solutionId,
+      };
+    }
+
     return {
       type: 'solution',
       category,
       problemName: modelSpecificSolution.problemName,
       solutionId: modelSpecificSolution.solutionId,
-      message: formatSolutionMessage(modelSpecificSolution.problemName),
+      message: formatSolutionMessage(
+        modelSpecificSolution.problemName,
+        undefined,
+        modelSpecificSolution.possibleCauses,
+        modelSpecificSolution.safeCustomerChecks
+      ),
       solutionSteps: modelSpecificSolution.solutionSteps,
       nextIfNotSolved: modelSpecificSolution.nextIfNotSolved,
       escalationRequired: false,
@@ -391,6 +608,22 @@ export function analyzeSupportMessage(input: ManualSupportInput): ManualSupportR
   const commonProblem = matchCommonProblem(input, normalizedMessage);
 
   if (commonProblem) {
+    if (
+      isRouterCategory(commonProblem.category) &&
+      (commonProblem.requiresModel || commonProblem.requiresHardwareVersion || commonProblem.requiresStickerPhoto) &&
+      !input.model
+    ) {
+      return {
+        type: 'question',
+        category: commonProblem.category,
+        problemName: commonProblem.problemName,
+        problemId: commonProblem.problemId,
+        message: 'Please share your router model or upload a clear photo of the backside sticker. You can also write the model manually, for example: TL-WR845N Ver 4.',
+        escalationRequired: false,
+        activeSolutionId: commonProblem.problemId,
+      };
+    }
+
     return {
       type: 'solution',
       category: commonProblem.category,
@@ -399,9 +632,10 @@ export function analyzeSupportMessage(input: ManualSupportInput): ManualSupportR
       message: formatSolutionMessage(
         commonProblem.problemName,
         commonProblem.customerExplanation,
-        commonProblem.possibleCauses
+        commonProblem.possibleCauses,
+        commonProblem.safeCustomerChecks
       ),
-      solutionSteps: commonProblem.solutionSteps,
+      solutionSteps: commonProblem.safeCustomerChecks?.length ? commonProblem.safeCustomerChecks : commonProblem.solutionSteps,
       nextIfNotSolved: commonProblem.nextIfNotSolved,
       escalationRequired: false,
       activeSolutionId: commonProblem.problemId,

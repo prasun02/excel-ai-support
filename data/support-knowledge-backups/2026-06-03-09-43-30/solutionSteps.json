@@ -1,0 +1,72 @@
+[
+  {
+    "stepId": "ROUTER_INTERNET_INTERNET_AUTO_DISCONNECT_COMMON_CHECK_ADAPTER_01",
+    "stepGroupId": "ROUTER_INTERNET_INTERNET_AUTO_DISCONNECT_COMMON_CHECK_ADAPTER",
+    "problemId": "ROUTER_INTERNET_INTERNET_AUTO_DISCONNECT_COMMON",
+    "problemName": "Internet Auto Disconnect",
+    "stepGroupCode": "CHECK_ADAPTER",
+    "stepOrder": 1,
+    "customerStepText": "Check whether the router adapter is firmly connected to the power socket and router",
+    "expectedResult": "Router power light should stay stable",
+    "procedureCode": "",
+    "imageUrl": "",
+    "videoUrl": "",
+    "active": true
+  },
+  {
+    "stepId": "ROUTER_INTERNET_INTERNET_AUTO_DISCONNECT_COMMON_CHECK_ADAPTER_02",
+    "stepGroupId": "ROUTER_INTERNET_INTERNET_AUTO_DISCONNECT_COMMON_CHECK_ADAPTER",
+    "problemId": "ROUTER_INTERNET_INTERNET_AUTO_DISCONNECT_COMMON",
+    "problemName": "Internet Auto Disconnect",
+    "stepGroupCode": "CHECK_ADAPTER",
+    "stepOrder": 2,
+    "customerStepText": "If possible test with another compatible same voltage and current adapter",
+    "expectedResult": "Router should stop restarting if adapter was faulty",
+    "procedureCode": "",
+    "imageUrl": "",
+    "videoUrl": "",
+    "active": true
+  },
+  {
+    "stepId": "ROUTER_INTERNET_INTERNET_AUTO_DISCONNECT_COMMON_CHECK_FIRMWARE_UPDATE_01",
+    "stepGroupId": "ROUTER_INTERNET_INTERNET_AUTO_DISCONNECT_COMMON_CHECK_FIRMWARE_UPDATE",
+    "problemId": "ROUTER_INTERNET_INTERNET_AUTO_DISCONNECT_COMMON",
+    "problemName": "Internet Auto Disconnect",
+    "stepGroupCode": "CHECK_FIRMWARE_UPDATE",
+    "stepOrder": 1,
+    "customerStepText": "Update router firmware only after confirming exact model and hardware version",
+    "expectedResult": "Firmware update should complete successfully",
+    "procedureCode": "ARCHER_C6_V4_FW_UPDATE",
+    "imageUrl": "",
+    "videoUrl": "",
+    "active": true
+  },
+  {
+    "stepId": "ROUTER_INTERNET_SLOW_INTERNET_COMMON_CHECK_SPEED_BASIC_01",
+    "stepGroupId": "ROUTER_INTERNET_SLOW_INTERNET_COMMON_CHECK_SPEED_BASIC",
+    "problemId": "ROUTER_INTERNET_SLOW_INTERNET_COMMON",
+    "problemName": "Slow Internet",
+    "stepGroupCode": "CHECK_SPEED_BASIC",
+    "stepOrder": 1,
+    "customerStepText": "Restart the router and wait 2 minutes",
+    "expectedResult": "Router should reconnect cleanly",
+    "procedureCode": "",
+    "imageUrl": "",
+    "videoUrl": "",
+    "active": true
+  },
+  {
+    "stepId": "ROUTER_INTERNET_SLOW_INTERNET_COMMON_CHECK_SPEED_BASIC_02",
+    "stepGroupId": "ROUTER_INTERNET_SLOW_INTERNET_COMMON_CHECK_SPEED_BASIC",
+    "problemId": "ROUTER_INTERNET_SLOW_INTERNET_COMMON",
+    "problemName": "Slow Internet",
+    "stepGroupCode": "CHECK_SPEED_BASIC",
+    "stepOrder": 2,
+    "customerStepText": "Check if too many devices are connected",
+    "expectedResult": "Speed should improve after reducing load",
+    "procedureCode": "",
+    "imageUrl": "",
+    "videoUrl": "",
+    "active": true
+  }
+]

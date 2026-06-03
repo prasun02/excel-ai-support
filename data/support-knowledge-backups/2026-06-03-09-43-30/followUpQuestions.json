@@ -1,0 +1,48 @@
+[
+  {
+    "parentSolutionId": "CHECK_FIRMWARE_UPDATE",
+    "parentType": "stepGroup",
+    "parentCode": "CHECK_FIRMWARE_UPDATE",
+    "questionKeywords": [
+      "how update firmware",
+      "how to firmware update",
+      "firmware process",
+      "how do that"
+    ],
+    "answer": "Firmware update depends on exact model and hardware version. Please confirm model and hardware version from router sticker.",
+    "procedureCode": "ARCHER_C6_V4_FW_UPDATE",
+    "maxRepeatBeforeEscalation": 2,
+    "language": "en",
+    "active": true
+  },
+  {
+    "parentSolutionId": "ARCHER_C6_V4_FW_UPDATE",
+    "parentType": "procedure",
+    "parentCode": "ARCHER_C6_V4_FW_UPDATE",
+    "questionKeywords": [
+      "where is hardware version",
+      "how find version",
+      "version not showing"
+    ],
+    "answer": "You can usually find hardware version on the router sticker. It may show as Ver 4.0 or V4.",
+    "procedureCode": "",
+    "maxRepeatBeforeEscalation": 2,
+    "language": "en",
+    "active": true
+  },
+  {
+    "parentSolutionId": "ARCHER_C6_V4_FW_UPDATE",
+    "parentType": "procedure",
+    "parentCode": "ARCHER_C6_V4_FW_UPDATE",
+    "questionKeywords": [
+      "router login not opening",
+      "192.168.0.1 not opening",
+      "login page not opening"
+    ],
+    "answer": "Please check if your phone or computer is connected to the router WiFi or LAN. Then check the default gateway IP. If still not opening please contact support.",
+    "procedureCode": "ROUTER_LOGIN_COMMON",
+    "maxRepeatBeforeEscalation": 2,
+    "language": "en",
+    "active": true
+  }
+]

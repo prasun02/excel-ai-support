@@ -28,20 +28,5 @@
     "imageUrl": "",
     "videoUrl": "",
     "active": true
-  },
-  {
-    "procedureId": "TP_LINK_TP_LINK_TL_WR845N_VER_4_FIRMWARE_UPDATE_AND_QUICK_SETUP",
-    "procedureCode": "TP_LINK_TP_LINK_TL_WR845N_VER_4_FIRMWARE_UPDATE_AND_QUICK_SETUP",
-    "procedureName": "TP-Link TL-WR845N Ver 4 firmware update and quick setup",
-    "category": "Router / Internet",
-    "brand": "TP-Link",
-    "model": "TL-WR845N",
-    "hardwareVersion": "V4",
-    "procedureType": "firmware_update",
-    "shortAnswer": "TP-Link TL-WR845N Ver 4 firmware update and quick setup",
-    "warning": "Firmware update must match exact model and hardware version. Wrong firmware or power loss during update may damage router. If you are unsure, please visit Excel CSP.",
-    "imageUrl": "",
-    "videoUrl": "",
-    "active": true
   }
 ]

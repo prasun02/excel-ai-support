@@ -21,6 +21,9 @@ import {
   findModelWiseSolution,
   getDefaultSimpleSupportKnowledge,
 } from '@/lib/modelWiseKnowledge';
+import {
+  analyzeSupportMessage as analyzeManualSupportKnowledge,
+} from '@/lib/supportKnowledgeEngine';
 import type {
   AiIntentMatch,
   LocalSupportTicket,
@@ -225,6 +228,23 @@ function solutionReply(
   return `${heading}\n\n${steps}\n\n${solvedQuestion}`;
 }
 
+function manualKnowledgeReply(
+  responseText: string,
+  solutionSteps: string[] = [],
+  nextIfNotSolved = ''
+) {
+  const steps = solutionSteps.length
+    ? `\n\n${solutionSteps.map((step, index) => {
+        if (step.includes('\n')) return step;
+        const isAlreadyNumbered = /^\d+\./.test(step.trim());
+        return isAlreadyNumbered ? step : `${index + 1}. ${step}`;
+      }).join('\n')}`
+    : '';
+  const next = nextIfNotSolved ? `\n\nNext: ${nextIfNotSolved}` : '';
+
+  return `${responseText}${steps}${next}`;
+}
+
 function purchaseLocationReply(language: ReplyLanguage) {
   return language === 'bn' ? '\u09a7\u09a8\u09cd\u09af\u09ac\u09be\u09a6\u0964 \u0986\u09aa\u09a8\u09be\u09b0 \u09b2\u09cb\u0995\u09c7\u09b6\u09a8 \u0985\u09a8\u09c1\u09af\u09be\u09df\u09c0 \u0986\u09ae\u09be\u09a6\u09c7\u09b0 \u09b8\u09c7\u09b2\u09b8 \u099f\u09bf\u09ae \u09af\u09cb\u0997\u09be\u09af\u09cb\u0997 \u0995\u09b0\u09a4\u09c7 \u09aa\u09be\u09b0\u09ac\u09c7\u0964 \u0985\u09a8\u09c1\u0997\u09cd\u09b0\u09b9 \u0995\u09b0\u09c7 \u0986\u09aa\u09a8\u09be\u09b0 \u09ab\u09cb\u09a8 \u09a8\u09ae\u09cd\u09ac\u09b0 \u09a6\u09bf\u09a8 \u0985\u09a5\u09ac\u09be \u09a8\u09bf\u0995\u099f\u09b8\u09cd\u09a5 Excel sales point-\u098f \u09af\u09cb\u0997\u09be\u09af\u09cb\u0997 \u0995\u09b0\u09c1\u09a8\u0964' : 'Thank you. Our sales team can contact you based on your location. Please share your phone number or contact your nearest Excel sales point.';
 }
@@ -374,6 +394,59 @@ export function getNextTroubleshootingResponse(input: TroubleshootingInput): Tro
     ? analysis.category
     : input.selectedCategory;
   const selectedCategory = categoryFromContext(ticketState, categoryHint) || analysis.category;
+
+  const manualKnowledge = selectedCategory
+    ? analyzeManualSupportKnowledge({
+        message: input.message,
+        selectedCategory,
+        model: ticketState.productModel || '',
+        serialNumber: ticketState.serialNumber || '',
+        activeSolutionId: ticketState.currentFlowId || '',
+        lastProblemName: ticketState.issueType || '',
+      })
+    : null;
+
+  if (
+    manualKnowledge &&
+    manualKnowledge.type !== 'escalation' &&
+    manualKnowledge.type !== 'non_support' &&
+    (manualKnowledge.activeSolutionId || manualKnowledge.solutionSteps?.length || manualKnowledge.type === 'question')
+  ) {
+    const hasFinalSteps = Boolean(
+      manualKnowledge.solutionSteps?.length &&
+      /here (are|is) the|approved procedure/i.test(manualKnowledge.message)
+    );
+    const responseText = manualKnowledgeReply(
+      manualKnowledge.message,
+      hasFinalSteps ? manualKnowledge.solutionSteps : [],
+      hasFinalSteps ? manualKnowledge.nextIfNotSolved : ''
+    );
+
+    return {
+      responseText,
+      updatedTicketState: {
+        ...ticketState,
+        category: manualKnowledge.category || selectedCategory,
+        selectedCategory: manualKnowledge.category || selectedCategory,
+        issueType: manualKnowledge.problemName || ticketState.issueType || analysis.issueType,
+        currentFlowId: manualKnowledge.activeSolutionId || manualKnowledge.solutionId || manualKnowledge.problemId || ticketState.currentFlowId,
+        currentQuestionIndex: ticketState.currentQuestionIndex ?? 0,
+        currentStep: ticketState.currentStep ?? 0,
+        askedQuestions: ticketState.askedQuestions || [],
+        userAnswers: ticketState.userAnswers || [],
+        solutionGiven: hasFinalSteps,
+        solvedStatus: 'pending',
+        awaitingLocation: false,
+        escalationActive: false,
+        escalationCompleted: false,
+      },
+      detectedCategory: manualKnowledge.category || selectedCategory,
+      detectedIssueType: manualKnowledge.problemName || analysis.issueType,
+      needsCategorySelection: false,
+      matched: true,
+      language,
+    };
+  }
 
   if (
     ticketState.awaitingLocation &&

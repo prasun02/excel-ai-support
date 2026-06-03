@@ -1,0 +1,24 @@
+[
+  {
+    "productId": "TP_LINK_ARCHER_C6_V4",
+    "category": "Router / Internet",
+    "brand": "TP-Link",
+    "model": "Archer C6",
+    "hardwareVersion": "V4",
+    "firmwareVersion": "",
+    "modelFamily": "Archer C6",
+    "deviceType": "Router",
+    "active": true
+  },
+  {
+    "productId": "TP_LINK_ARCHER_C6_V3",
+    "category": "Router / Internet",
+    "brand": "TP-Link",
+    "model": "Archer C6",
+    "hardwareVersion": "V3",
+    "firmwareVersion": "",
+    "modelFamily": "Archer C6",
+    "deviceType": "Router",
+    "active": true
+  }
+]

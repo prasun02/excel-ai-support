@@ -1,0 +1,43 @@
+[
+  {
+    "problemId": "ROUTER_INTERNET_INTERNET_AUTO_DISCONNECT_COMMON",
+    "category": "Router / Internet",
+    "modelFamily": "General",
+    "problemName": "Internet Auto Disconnect",
+    "symptoms": [
+      "internet auto disconnect",
+      "net disconnect",
+      "wifi disconnect",
+      "connection drops",
+      "router disconnect",
+      "auto cut"
+    ],
+    "solutionSteps": [
+      "Check whether the router adapter is firmly connected to the power socket and router",
+      "If possible test with another compatible same voltage and current adapter"
+    ],
+    "nextIfNotSolved": "Please check the steps above and tell me if the issue is solved.",
+    "defaultFirstStepGroupCode": "CHECK_ADAPTER",
+    "active": true
+  },
+  {
+    "problemId": "ROUTER_INTERNET_SLOW_INTERNET_COMMON",
+    "category": "Router / Internet",
+    "modelFamily": "General",
+    "problemName": "Slow Internet",
+    "symptoms": [
+      "net slow",
+      "internet slow",
+      "wifi slow",
+      "speed low",
+      "browsing slow"
+    ],
+    "solutionSteps": [
+      "Restart the router and wait 2 minutes",
+      "Check if too many devices are connected"
+    ],
+    "nextIfNotSolved": "Please check the steps above and tell me if the issue is solved.",
+    "defaultFirstStepGroupCode": "CHECK_SPEED_BASIC",
+    "active": true
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "solutionId": "ARCHER_C6_V4_INTERNET_AUTO_DISCONNECT_001",
+    "productId": "TP_LINK_ARCHER_C6_V4",
+    "model": "Archer C6",
+    "problemName": "Internet Auto Disconnect",
+    "symptoms": [
+      "internet auto disconnect",
+      "net disconnect",
+      "wifi disconnect",
+      "connection drops",
+      "router disconnect",
+      "auto cut"
+    ],
+    "solutionSteps": [
+      "Update router firmware only after confirming exact model and hardware version",
+      "Download exact Archer C6 V4 firmware login to router and upload firmware file"
+    ],
+    "nextIfNotSolved": "If the issue is still not solved, I can forward this to human support.",
+    "imageUrl": "",
+    "videoUrl": "",
+    "active": true
+  }
+]
