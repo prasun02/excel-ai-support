@@ -395,6 +395,42 @@ export function getNextTroubleshootingResponse(input: TroubleshootingInput): Tro
     : input.selectedCategory;
   const selectedCategory = categoryFromContext(ticketState, categoryHint) || analysis.category;
 
+  if (
+    ticketState.awaitingLocation &&
+    ticketState.escalationActive &&
+    !isSolved(input.message) &&
+    !isNotSolved(input.message)
+  ) {
+    const flow =
+      findFlowById(ticketState.currentFlowId) ||
+      flows.find((item) => sameCategory(item.category, selectedCategory)) ||
+      flows[0];
+    const locationReply = locationSupportReply(input.message, language);
+    const responseText = locationReply.locationFound
+      ? `${locationReply.text}\n\n${postEscalationPrompt(language)}`
+      : locationReply.text;
+
+    return result(
+      flow,
+      responseText,
+      buildContext(
+        flow,
+        ticketState.currentQuestionIndex ?? ticketState.currentStep ?? 0,
+        ticketState.askedQuestions || [],
+        [...(ticketState.userAnswers || []), input.message],
+        true,
+        'not_solved',
+        {
+          awaitingLocation: !locationReply.locationFound,
+          escalationActive: !locationReply.locationFound,
+          escalationCompleted: locationReply.locationFound,
+        }
+      ),
+      language,
+      true
+    );
+  }
+
   const manualKnowledge = selectedCategory
     ? analyzeManualSupportKnowledge({
         message: input.message,
@@ -408,6 +444,8 @@ export function getNextTroubleshootingResponse(input: TroubleshootingInput): Tro
 
   if (
     manualKnowledge &&
+    !isHumanHelpRequest(input.message) &&
+    !isNotSolved(input.message) &&
     manualKnowledge.type !== 'escalation' &&
     manualKnowledge.type !== 'non_support' &&
     (manualKnowledge.activeSolutionId || manualKnowledge.solutionSteps?.length || manualKnowledge.type === 'question')

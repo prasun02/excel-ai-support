@@ -21,6 +21,7 @@ import {
   nonSupportReply,
 } from '@/lib/languageUnderstanding';
 import { bn } from '@/lib/i18n';
+import { findBestProductMatches } from '@/lib/productModelMatcher';
 import { simpleCsvRowToKnowledge, type SimpleSupportCsvRow } from '@/lib/simpleKnowledgeImport';
 import { isProductInfoSkip, parseProductInfo } from '@/lib/productInfoParser';
 import {
@@ -652,17 +653,45 @@ export default function ChatPage() {
       const currentCategory = selectedCategory?.value || workingTicket.selectedCategory || workingTicket.category;
       const hasRealCategory = Boolean(currentCategory && currentCategory !== 'General Support');
       const productInfo = parseProductInfo(trimmedContent);
+      const productMatches = findBestProductMatches({
+        text: trimmedContent,
+        categoryHint: currentCategory,
+        maxResults: 3,
+      });
 
       if (productInfo.hasProductInfo && !analysis.issueType) {
-        const assistantMessage = makeMessage('assistant', productInfoSavedMessage(language));
+        const bestProduct = productMatches.bestMatch;
+        const closeMatches = productMatches.matches.filter(
+          (match) => bestProduct && bestProduct.score - match.score <= 15
+        );
+        const assistantText = bestProduct && ['high', 'medium'].includes(productMatches.confidence)
+          ? closeMatches.length > 1 && productMatches.confidence !== 'high'
+            ? `I found multiple possible devices. Please confirm which one is correct:\n\n${productMatches.matches.map((match, index) => `${index + 1}. ${match.itemName}`).join('\n')}`
+            : `As per your input, I found this device: ${bestProduct.itemName}. If this is the correct model, please share the problem you are facing.`
+          : productInfoSavedMessage(language);
+        const assistantMessage = makeMessage('assistant', assistantText);
         const saved = appendMessagesToTicket(workingTicket, [userMessage, assistantMessage], {
           customerName: requesterName,
           customerContact: requesterContact,
-          productModel: productInfo.model || workingTicket.productModel,
+          selectedCategory: bestProduct?.category || workingTicket.selectedCategory,
+          category: bestProduct?.category || workingTicket.category,
+          productModel: (bestProduct?.model || productInfo.model || workingTicket.productModel).replace(/\b(?:ver|version|v)\s*\.?\s*\d+(?:\.\d+)?\b/i, '').trim(),
+          currentProductId: bestProduct?.productId || workingTicket.currentProductId,
+          currentProductName: bestProduct?.itemName || workingTicket.currentProductName,
+          currentModel: (bestProduct?.model || productInfo.model || workingTicket.currentModel || '').replace(/\b(?:ver|version|v)\s*\.?\s*\d+(?:\.\d+)?\b/i, '').trim(),
+          currentHardwareVersion: productInfo.hardwareVersion || workingTicket.currentHardwareVersion,
           serialNumber: productInfo.serialNumber || workingTicket.serialNumber,
+          currentSN: productInfo.serialNumber || workingTicket.currentSN || workingTicket.serialNumber,
           productInfoAsked: true,
         });
 
+        if (bestProduct?.category) {
+          const matchedCategory = categories.find((category) => category.value === bestProduct.category);
+          if (matchedCategory) {
+            setSelectedCategory(matchedCategory);
+            saveActiveCategory(matchedCategory.value);
+          }
+        }
         setTicketState(saved.ticket, saved.tickets);
         setMessages([...messages, userMessage, assistantMessage]);
         setAwaitingCategorySelection(false);
