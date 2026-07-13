@@ -9,6 +9,7 @@ import { analyzeStickerImagePlaceholder } from '@/lib/stickerImageAnalyzer';
 import { getNextTroubleshootingResponse } from '@/lib/troubleshootingEngine';
 import {
   getUniversalSupportResponse,
+  isUniversalSupportEnabled,
   manualKnowledgeHasApprovedAnswer,
   universalAnswerToChatContent,
   universalAnswerToTicketCategory,
@@ -127,12 +128,13 @@ export async function POST(req: Request) {
   });
   const productInfo = parseProductInfo(latestMessage);
   const routerProblem = detectRouterProblem({ message: latestMessage });
+  const universalSupportEnabled = isUniversalSupportEnabled();
   const hasActiveRouterProblem = Boolean(
     (effectiveTicketContext.selectedCategory || effectiveTicketContext.category || effectiveCategory) === 'Router / Internet' &&
       effectiveTicketContext.issueType
   );
   const routerFollowUpAnswer = hasActiveRouterProblem ? getRouterFollowUpAnswer(latestMessage) : '';
-  if (routerFollowUpAnswer) {
+  if (!universalSupportEnabled && routerFollowUpAnswer) {
     return apiResult({
       ticketId,
       latestMessage,
@@ -148,7 +150,7 @@ export async function POST(req: Request) {
     hasActiveRouterProblem &&
     /(yes|yes i want|solution|guide me|bolo|bolen|chai|start|how update firmware|firmware|update|router page|router ip|192\.168\.0\.1|192\.168\.1\.1|how configure|quick setup)/i.test(latestMessage);
 
-  if (asksForGuidedRouter) {
+  if (!universalSupportEnabled && asksForGuidedRouter) {
     const guided = getRouterGuidedProcess({
       brand: productMatches.bestMatch?.brand || '',
       model: effectiveTicketContext.productModel || productMatches.bestMatch?.model || '',

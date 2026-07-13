@@ -34,15 +34,23 @@ type UniversalRouterInput = {
 
 type UniversalRouterResult = {
   answer: UniversalSupportAnswer;
-  source: 'api' | 'fallback';
+  source: 'openai' | 'fallback';
 };
 
-const manualAnswerPatterns = [
-  /Excel-approved/i,
+const approvedManualAnswerPatterns = [
+  /Here are the Excel-approved safe troubleshooting steps/i,
+  /Here is the approved procedure/i,
   /approved procedure/i,
-  /I found an Excel-approved/i,
+];
+
+const genericManualQuestionPatterns = [
   /Please share your router model/i,
   /Warranty details may need to be checked/i,
+  /You may be asking about/i,
+  /To understand better, please answer/i,
+  /Do you want step-by-step guidance/i,
+  /I can guide you with safe checks first/i,
+  /I do not have an Excel-approved exact solution/i,
 ];
 
 const noUniversalIntentPatterns = [
@@ -62,6 +70,12 @@ function envFlagEnabled(value: string | undefined) {
   return String(value || '').toLowerCase() === 'true';
 }
 
+function logUniversalSupportDev(message: string, value?: string | boolean) {
+  if (process.env.NODE_ENV !== 'development') return;
+
+  console.log(value === undefined ? message : `${message}: ${value}`);
+}
+
 export function isUniversalSupportEnabled() {
   return envFlagEnabled(process.env.ENABLE_UNIVERSAL_AI_SUPPORT);
 }
@@ -76,14 +90,29 @@ function isLegacyDiagnosticQuestion(result?: ManualKnowledgeLikeResult | null) {
   );
 }
 
+function isGenericManualQuestion(result?: ManualKnowledgeLikeResult | null) {
+  if (!result?.responseText) return false;
+
+  return genericManualQuestionPatterns.some((pattern) => pattern.test(result.responseText || '')) ||
+    isLegacyDiagnosticQuestion(result);
+}
+
 export function manualKnowledgeHasApprovedAnswer(result?: ManualKnowledgeLikeResult | null) {
   if (!result?.matched || !result.responseText) return false;
-  if (manualAnswerPatterns.some((pattern) => pattern.test(result.responseText || ''))) return true;
+  if (isGenericManualQuestion(result)) return false;
 
   const flowId = result.updatedTicketState?.currentFlowId || '';
-  const hasNonLegacyFlowId = Boolean(flowId && !flowId.includes('::') && flowId !== 'UNIVERSAL_AI_SUPPORT');
+  const hasExactManualFlowId = Boolean(
+    flowId &&
+      !flowId.includes('::') &&
+      flowId !== 'UNIVERSAL_AI_SUPPORT'
+  );
+  const solutionGiven = Boolean(result.updatedTicketState?.solutionGiven);
 
-  return hasNonLegacyFlowId && !isLegacyDiagnosticQuestion(result);
+  return solutionGiven && (
+    approvedManualAnswerPatterns.some((pattern) => pattern.test(result.responseText || '')) ||
+      hasExactManualFlowId
+  );
 }
 
 function userAskedForEscalationOrFollowUp(message: string) {
@@ -91,15 +120,19 @@ function userAskedForEscalationOrFollowUp(message: string) {
 }
 
 export function shouldUseUniversalSupport(input: UniversalRouterInput) {
-  if (!isUniversalSupportEnabled()) return false;
+  const universalEnabled = isUniversalSupportEnabled();
+
+  logUniversalSupportDev('UNIVERSAL_AI_ENABLED', universalEnabled);
+
+  if (!universalEnabled) return false;
   if (input.detectedIntent === 'non_support') return false;
   if (input.detectedIntent === 'purchase_query') return false;
+  if (input.detectedIntent === 'location_reply') return false;
   if (userAskedForEscalationOrFollowUp(input.payload.message)) return false;
   if (manualKnowledgeHasApprovedAnswer(input.manualKnowledgeResult)) return false;
   if (input.manualKnowledgeResult?.needsCategorySelection) return false;
-  if (!input.manualKnowledgeResult?.matched) return true;
 
-  return !input.hasActiveFlow && isLegacyDiagnosticQuestion(input.manualKnowledgeResult);
+  return true;
 }
 
 export async function getUniversalSupportResponse(input: UniversalRouterInput): Promise<UniversalRouterResult | null> {
@@ -107,7 +140,11 @@ export async function getUniversalSupportResponse(input: UniversalRouterInput): 
 
   const fallback = getUniversalSupportFallback(input.payload);
 
+  logUniversalSupportDev('CALLING_UNIVERSAL_AI');
+
   if (!input.requestUrl) {
+    logUniversalSupportDev('UNIVERSAL_AI_RESULT_SOURCE', 'fallback');
+
     return { answer: fallback, source: 'fallback' };
   }
 
@@ -121,13 +158,22 @@ export async function getUniversalSupportResponse(input: UniversalRouterInput): 
     });
 
     if (!response.ok) {
+      logUniversalSupportDev('UNIVERSAL_AI_RESULT_SOURCE', 'fallback');
+
       return { answer: fallback, source: 'fallback' };
     }
 
     const data = await response.json();
+    const source = response.headers.get('X-Universal-AI-Source') === 'openai'
+      ? 'openai'
+      : 'fallback';
 
-    return { answer: sanitizeUniversalAnswer(data, input.payload), source: 'api' };
+    logUniversalSupportDev('UNIVERSAL_AI_RESULT_SOURCE', source);
+
+    return { answer: sanitizeUniversalAnswer(data, input.payload), source };
   } catch {
+    logUniversalSupportDev('UNIVERSAL_AI_RESULT_SOURCE', 'fallback');
+
     return { answer: fallback, source: 'fallback' };
   }
 }
