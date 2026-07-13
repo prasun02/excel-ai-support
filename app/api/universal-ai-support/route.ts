@@ -14,13 +14,13 @@ export async function POST(req: Request) {
   };
 
   if (!input.message) {
-    return Response.json(result.answer, {
+    return Response.json({ ...result.answer, source: result.source }, {
       status: 400,
       ...responseInit,
     });
   }
 
-  return Response.json(result.answer, responseInit);
+  return Response.json({ ...result.answer, source: result.source }, responseInit);
 }
 
 async function readBody(req: Request) {

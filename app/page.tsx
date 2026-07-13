@@ -257,6 +257,20 @@ function productInfoSkippedMessage(language: ReplyLanguage) {
     : 'No problem. Please write or tell your issue now.';
 }
 
+function ticketContextValue<T>(
+  context: Partial<LocalSupportTicket> | undefined,
+  key: keyof LocalSupportTicket,
+  fallback: T
+): T {
+  if (!context || !Object.prototype.hasOwnProperty.call(context, key)) {
+    return fallback;
+  }
+
+  const value = context[key] as T | undefined;
+
+  return value === undefined ? fallback : value;
+}
+
 function loadImportedSimpleKnowledge(): SimpleSupportKnowledgeItem[] {
   if (typeof window === 'undefined') return [];
 
@@ -284,6 +298,22 @@ function createTicketFromApiResponse(
     customerContact,
     productModel: data.ticketContext?.productModel || '',
     serialNumber: data.ticketContext?.serialNumber || '',
+    currentCategory: data.ticketContext?.currentCategory || data.category,
+    currentProblemName: data.ticketContext?.currentProblemName || data.ticketContext?.issueType || '',
+    currentProductId: data.ticketContext?.currentProductId || '',
+    currentProductName: data.ticketContext?.currentProductName || '',
+    currentModel: data.ticketContext?.currentModel || data.ticketContext?.productModel || '',
+    currentHardwareVersion: data.ticketContext?.currentHardwareVersion || '',
+    currentSN: data.ticketContext?.currentSN || data.ticketContext?.serialNumber || '',
+    activeSupportFlow: data.ticketContext?.activeSupportFlow || '',
+    activeProblemId: data.ticketContext?.activeProblemId || data.ticketContext?.issueType || '',
+    activeSolutionId: data.ticketContext?.activeSolutionId || '',
+    activeStepGroupId: data.ticketContext?.activeStepGroupId || '',
+    activeProcedureId: data.ticketContext?.activeProcedureId || '',
+    waitingForGuidedConfirmation: Boolean(data.ticketContext?.waitingForGuidedConfirmation),
+    waitingForModelOrSticker: Boolean(data.ticketContext?.waitingForModelOrSticker),
+    waitingForProblemDetails: Boolean(data.ticketContext?.waitingForProblemDetails),
+    waitingForLocation: Boolean(data.ticketContext?.waitingForLocation),
     productInfoAsked: Boolean(data.ticketContext?.productInfoAsked),
     selectedCategory: data.category,
     messages,
@@ -526,19 +556,35 @@ export default function ChatPage() {
       const saved = appendMessagesToTicket(ticket, [...unsavedBaseMessages, assistantMessage], {
         customerName: requesterName,
         customerContact: requesterContact,
-        productModel: data.ticketContext?.productModel || ticket.productModel,
-        serialNumber: data.ticketContext?.serialNumber || ticket.serialNumber,
-        productInfoAsked: data.ticketContext?.productInfoAsked ?? ticket.productInfoAsked,
+        productModel: ticketContextValue(data.ticketContext, 'productModel', ticket.productModel),
+        serialNumber: ticketContextValue(data.ticketContext, 'serialNumber', ticket.serialNumber),
+        currentCategory: ticketContextValue(data.ticketContext, 'currentCategory', data.category),
+        currentProblemName: ticketContextValue(data.ticketContext, 'currentProblemName', ticket.currentProblemName || ''),
+        currentProductId: ticketContextValue(data.ticketContext, 'currentProductId', ticket.currentProductId || ''),
+        currentProductName: ticketContextValue(data.ticketContext, 'currentProductName', ticket.currentProductName || ''),
+        currentModel: ticketContextValue(data.ticketContext, 'currentModel', ticket.currentModel || ''),
+        currentHardwareVersion: ticketContextValue(data.ticketContext, 'currentHardwareVersion', ticket.currentHardwareVersion || ''),
+        currentSN: ticketContextValue(data.ticketContext, 'currentSN', ticket.currentSN || ''),
+        activeSupportFlow: ticketContextValue(data.ticketContext, 'activeSupportFlow', ticket.activeSupportFlow || ''),
+        activeProblemId: ticketContextValue(data.ticketContext, 'activeProblemId', ticket.activeProblemId || ''),
+        activeSolutionId: ticketContextValue(data.ticketContext, 'activeSolutionId', ticket.activeSolutionId || ''),
+        activeStepGroupId: ticketContextValue(data.ticketContext, 'activeStepGroupId', ticket.activeStepGroupId || ''),
+        activeProcedureId: ticketContextValue(data.ticketContext, 'activeProcedureId', ticket.activeProcedureId || ''),
+        waitingForGuidedConfirmation: ticketContextValue(data.ticketContext, 'waitingForGuidedConfirmation', Boolean(ticket.waitingForGuidedConfirmation)),
+        waitingForModelOrSticker: ticketContextValue(data.ticketContext, 'waitingForModelOrSticker', Boolean(ticket.waitingForModelOrSticker)),
+        waitingForProblemDetails: ticketContextValue(data.ticketContext, 'waitingForProblemDetails', Boolean(ticket.waitingForProblemDetails)),
+        waitingForLocation: ticketContextValue(data.ticketContext, 'waitingForLocation', Boolean(ticket.waitingForLocation)),
+        productInfoAsked: ticketContextValue(data.ticketContext, 'productInfoAsked', ticket.productInfoAsked),
         selectedCategory: data.category,
         category: data.category,
-        issueType: data.ticketContext?.issueType || ticket.issueType,
-        currentFlowId: data.ticketContext?.currentFlowId || ticket.currentFlowId,
+        issueType: ticketContextValue(data.ticketContext, 'issueType', ticket.issueType),
+        currentFlowId: ticketContextValue(data.ticketContext, 'currentFlowId', ticket.currentFlowId),
         currentQuestionIndex: data.ticketContext?.currentQuestionIndex ?? ticket.currentQuestionIndex,
         currentStep: data.ticketContext?.currentStep ?? ticket.currentStep,
-        askedQuestions: data.ticketContext?.askedQuestions || ticket.askedQuestions,
-        userAnswers: data.ticketContext?.userAnswers || ticket.userAnswers,
+        askedQuestions: ticketContextValue(data.ticketContext, 'askedQuestions', ticket.askedQuestions),
+        userAnswers: ticketContextValue(data.ticketContext, 'userAnswers', ticket.userAnswers),
         solutionGiven: data.ticketContext?.solutionGiven ?? ticket.solutionGiven,
-        solvedStatus: data.ticketContext?.solvedStatus || ticket.solvedStatus,
+        solvedStatus: ticketContextValue(data.ticketContext, 'solvedStatus', ticket.solvedStatus),
         awaitingLocation: data.ticketContext?.awaitingLocation ?? ticket.awaitingLocation,
         escalationActive: data.ticketContext?.escalationActive ?? ticket.escalationActive,
         escalationCompleted: data.ticketContext?.escalationCompleted ?? ticket.escalationCompleted,

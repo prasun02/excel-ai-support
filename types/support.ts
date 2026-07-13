@@ -44,6 +44,8 @@ export type LocalSupportTicket = {
   activeStepGroupId?: string;
   activeProcedureId?: string;
   waitingForGuidedConfirmation?: boolean;
+  waitingForModelOrSticker?: boolean;
+  waitingForProblemDetails?: boolean;
   waitingForLocation?: boolean;
   productInfoAsked: boolean;
   selectedCategory: string;

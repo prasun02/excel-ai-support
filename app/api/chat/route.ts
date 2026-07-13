@@ -1,8 +1,6 @@
 import { matchIntentWithOptionalAi } from '@/lib/aiIntentMatcher';
 import { detectCategoryAndIntent } from '@/lib/categoryIntentDetector';
 import { answerDemoHybridSupport } from '@/lib/demoHybridSupportEngine';
-import { findBestProductMatches } from '@/lib/productModelMatcher';
-import { parseProductInfo } from '@/lib/productInfoParser';
 import { getRouterFollowUpAnswer, getRouterGuidedProcess, getRouterInitialAdvice } from '@/lib/routerGuidedSupport';
 import { detectRouterProblem } from '@/lib/routerProblemDetector';
 import { analyzeStickerImagePlaceholder } from '@/lib/stickerImageAnalyzer';
@@ -11,6 +9,7 @@ import {
   getUniversalSupportResponse,
   isUniversalSupportEnabled,
   manualKnowledgeHasApprovedAnswer,
+  prepareUniversalSupportRouting,
   universalAnswerToChatContent,
   universalAnswerToTicketCategory,
 } from '@/lib/universalSupportRouter';
@@ -60,37 +59,42 @@ export async function POST(req: Request) {
     } satisfies ChatApiResponse);
   }
 
+  const universalRouting = prepareUniversalSupportRouting({
+    message: latestMessage,
+    categoryHint,
+    currentState: ticketContext,
+  });
+  const universalDetected = universalRouting.detectedContext;
+  const effectiveCategory = universalRouting.effectiveCategory;
+  const effectiveTicketContext = universalRouting.updatedState as Partial<LocalSupportTicket>;
+
+  if (universalDetected.detectedCategory === 'Non Support') {
+    const content = "I'm here to help with Excel Technologies product support only. Please describe your product issue.";
+
+    return Response.json({
+      role: 'assistant',
+      ticketId,
+      category: effectiveTicketContext.category || categoryHint || ticketContext.category || '',
+      issue: latestMessage,
+      solution: content,
+      nextSteps: '',
+      supportNotice: '',
+      supportLink: 'https://www.excelbd.com/support/',
+      language: resultLanguage(latestMessage),
+      matched: false,
+      understood: false,
+      ticketContext: effectiveTicketContext,
+      content,
+    } satisfies ChatApiResponse);
+  }
+
   const detected = detectCategoryAndIntent({
     message: latestMessage,
-    previousCategory: ticketContext.selectedCategory || ticketContext.category || categoryHint,
-    activeProblemId: ticketContext.issueType,
-    activeSolutionId: ticketContext.currentFlowId,
-    waitingForLocation: Boolean(ticketContext.awaitingLocation),
+    previousCategory: effectiveCategory || effectiveTicketContext.selectedCategory || effectiveTicketContext.category || categoryHint,
+    activeProblemId: effectiveTicketContext.issueType,
+    activeSolutionId: effectiveTicketContext.currentFlowId,
+    waitingForLocation: Boolean(effectiveTicketContext.awaitingLocation),
   });
-  const effectiveCategory =
-    detected.intent === 'non_support'
-      ? categoryHint
-      : detected.categoryChanged || !categoryHint
-        ? detected.category
-        : categoryHint;
-  const effectiveTicketContext: Partial<LocalSupportTicket> = detected.shouldResetFlow
-    ? {
-        ...ticketContext,
-        selectedCategory: detected.category,
-        category: detected.category,
-        issueType: '',
-        currentFlowId: '',
-        currentQuestionIndex: 0,
-        currentStep: 0,
-        askedQuestions: [],
-        userAnswers: [],
-        solutionGiven: false,
-        solvedStatus: 'pending',
-        awaitingLocation: false,
-        escalationActive: false,
-        escalationCompleted: false,
-      }
-    : ticketContext;
 
   const aiIntent = await matchIntentWithOptionalAi({
     message: latestMessage,
@@ -121,12 +125,9 @@ export async function POST(req: Request) {
     } satisfies ChatApiResponse);
   }
 
-  const productMatches = findBestProductMatches({
-    text: latestMessage,
-    categoryHint: effectiveCategory || ticketContext.category || '',
-    maxResults: 3,
-  });
-  const productInfo = parseProductInfo(latestMessage);
+  const productMatches = universalRouting.productMatches;
+  const productInfo = universalRouting.productInfo;
+  const bestProductMatch = getConfidentProductMatch(productMatches);
   const routerProblem = detectRouterProblem({ message: latestMessage });
   const universalSupportEnabled = isUniversalSupportEnabled();
   const hasActiveRouterProblem = Boolean(
@@ -152,8 +153,8 @@ export async function POST(req: Request) {
 
   if (!universalSupportEnabled && asksForGuidedRouter) {
     const guided = getRouterGuidedProcess({
-      brand: productMatches.bestMatch?.brand || '',
-      model: effectiveTicketContext.productModel || productMatches.bestMatch?.model || '',
+      brand: bestProductMatch?.brand || '',
+      model: effectiveTicketContext.productModel || bestProductMatch?.model || '',
       hardwareVersion: effectiveTicketContext.currentHardwareVersion || extractHardwareVersion(effectiveTicketContext.productModel || latestMessage),
       problemName: effectiveTicketContext.issueType || routerProblem.problemName,
       customerHasConfirmedModel: Boolean(effectiveTicketContext.productModel),
@@ -178,8 +179,8 @@ export async function POST(req: Request) {
         category: 'Router / Internet',
         issueType: effectiveTicketContext.issueType || routerProblem.problemName,
         currentFlowId: effectiveTicketContext.currentFlowId || 'ROUTER_GUIDED_SUPPORT',
-        productModel: normalizeModel(productInfo.model || effectiveTicketContext.productModel || productMatches.bestMatch?.model || ''),
-        currentModel: normalizeModel(productInfo.model || effectiveTicketContext.currentModel || effectiveTicketContext.productModel || productMatches.bestMatch?.model || ''),
+        productModel: normalizeModel(productInfo.model || effectiveTicketContext.productModel || bestProductMatch?.model || ''),
+        currentModel: normalizeModel(productInfo.model || effectiveTicketContext.currentModel || effectiveTicketContext.productModel || bestProductMatch?.model || ''),
         currentHardwareVersion: productInfo.hardwareVersion || effectiveTicketContext.currentHardwareVersion || extractHardwareVersion(effectiveTicketContext.productModel || latestMessage),
         serialNumber: productInfo.serialNumber || effectiveTicketContext.serialNumber,
         currentSN: productInfo.serialNumber || effectiveTicketContext.currentSN || effectiveTicketContext.serialNumber,
@@ -265,14 +266,16 @@ export async function POST(req: Request) {
     payload: {
       message: latestMessage,
       category: result.detectedCategory || effectiveCategory || effectiveTicketContext.category || '',
-      detectedProduct: productMatches.bestMatch?.itemName || productMatches.bestMatch?.brand || '',
-      detectedModel: normalizeModel(productInfo.model || effectiveTicketContext.productModel || productMatches.bestMatch?.model || ''),
+      detectedProduct: bestProductMatch?.itemName || universalDetected.detectedProductName || bestProductMatch?.brand || '',
+      detectedModel: normalizeModel(productInfo.model || effectiveTicketContext.productModel || bestProductMatch?.model || universalDetected.detectedModel || ''),
+      detectedProblem: universalDetected.detectedProblem || result.detectedIssueType || effectiveTicketContext.currentProblemName || effectiveTicketContext.issueType || '',
       hardwareVersion: productInfo.hardwareVersion || effectiveTicketContext.currentHardwareVersion || extractHardwareVersion(effectiveTicketContext.productModel || latestMessage),
-      language: detected.language,
+      language: universalDetected.language,
       previousContext: {
         currentCategory: effectiveTicketContext.currentCategory || effectiveTicketContext.selectedCategory || effectiveTicketContext.category || effectiveCategory,
         currentProblemName: effectiveTicketContext.currentProblemName || effectiveTicketContext.issueType || result.detectedIssueType,
-        currentModel: effectiveTicketContext.currentModel || effectiveTicketContext.productModel || productMatches.bestMatch?.model || '',
+        currentProductName: effectiveTicketContext.currentProductName || bestProductMatch?.itemName || '',
+        currentModel: effectiveTicketContext.currentModel || effectiveTicketContext.productModel || bestProductMatch?.model || '',
         currentHardwareVersion: effectiveTicketContext.currentHardwareVersion || productInfo.hardwareVersion || '',
         activeSupportFlow: effectiveTicketContext.activeSupportFlow || effectiveTicketContext.currentFlowId || '',
       },
@@ -288,7 +291,7 @@ export async function POST(req: Request) {
       answer,
       result.detectedCategory || effectiveCategory || effectiveTicketContext.category || ''
     );
-    const productModel = normalizeModel(productInfo.model || effectiveTicketContext.productModel || productMatches.bestMatch?.model || '');
+    const productModel = normalizeModel(productInfo.model || effectiveTicketContext.productModel || bestProductMatch?.model || '');
     const hardwareVersion =
       productInfo.hardwareVersion ||
       effectiveTicketContext.currentHardwareVersion ||
@@ -307,8 +310,8 @@ export async function POST(req: Request) {
         category: ticketCategory || result.detectedCategory || effectiveCategory || effectiveTicketContext.category,
         currentCategory: ticketCategory || result.detectedCategory || effectiveCategory || effectiveTicketContext.currentCategory,
         currentProblemName: answer.detectedProblem,
-        currentProductId: productMatches.bestMatch?.productId || effectiveTicketContext.currentProductId,
-        currentProductName: productMatches.bestMatch?.itemName || effectiveTicketContext.currentProductName,
+        currentProductId: bestProductMatch?.productId || effectiveTicketContext.currentProductId,
+        currentProductName: bestProductMatch?.itemName || effectiveTicketContext.currentProductName,
         productModel,
         currentModel: productModel || effectiveTicketContext.currentModel,
         currentHardwareVersion: hardwareVersion,
@@ -529,6 +532,19 @@ function extractHardwareVersion(text: string) {
 
 function normalizeModel(model: string) {
   return model.replace(/\b(?:ver|version|v)\s*\.?\s*\d+(?:\.\d+)?\b/i, '').trim();
+}
+
+function getConfidentProductMatch<T extends { matchedBy: string[] }>(productMatches: {
+  bestMatch?: T;
+  confidence: 'high' | 'medium' | 'low' | 'none';
+}) {
+  const bestMatch = productMatches.bestMatch;
+
+  if (!bestMatch) return undefined;
+
+  return ['high', 'medium'].includes(productMatches.confidence) || isSpecificProductMatch(bestMatch)
+    ? bestMatch
+    : undefined;
 }
 
 function isGreeting(message: string) {

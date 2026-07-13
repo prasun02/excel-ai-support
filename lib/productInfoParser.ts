@@ -7,11 +7,11 @@ export type ProductInfoResult = {
 
 const MODEL_LABEL_PATTERN = /\b(?:model|mdl|product model)\s*[:#-]?\s*([a-z0-9][a-z0-9._/-]*(?:\s+[a-z0-9][a-z0-9._/-]*){0,4})/i;
 const SERIAL_LABEL_PATTERN = /\b(?:serial number|serial no|serial|sn|s\/n)\s*[:#-]?\s*([a-z0-9-]{5,})/i;
-const COMPACT_MODEL_PATTERN = /\b(?:archer|tp-link|tplink|mercusys|d-link|hikvision|ds-|wr|c|tl-|rt-|ups|dvr|nvr)[a-z0-9._/-]*(?:\s+[a-z0-9._/-]+){0,3}\b/i;
+const COMPACT_MODEL_PATTERN = /\b(?:tl[-\s]?[a-z0-9][a-z0-9._/-]*|wr[0-9][a-z0-9._/-]*|archer\s+[a-z0-9][a-z0-9._/-]*|deco\s+[a-z0-9][a-z0-9._/-]*|mercusys\s+[a-z0-9][a-z0-9._/-]*|ds[-\s]?[a-z0-9][a-z0-9._/-]+|(?:dvr|nvr)[-\s]?[a-z0-9][a-z0-9._/-]+|mr[-\s]?(?:spf|lbp)[a-z0-9._/-]*|l(?:8050|3210|1300|1800))\b/i;
 const SERIAL_LIKE_PATTERN = /\b(?=[a-z0-9-]*\d)(?=[a-z0-9-]*[a-z])[a-z0-9-]{8,}\b/i;
 const NUMERIC_SERIAL_PATTERN = /\b\d{8,}\b/;
 const HARDWARE_VERSION_PATTERN = /\b(?:ver|version|v)\s*\.?\s*(\d+(?:\.\d+)?)\b/i;
-const MODEL_PREFIX_PATTERN = /^(?:tl-|wr|archer|tp-link|tplink|mercusys|ds-|dvr|nvr)/i;
+const MODEL_PREFIX_PATTERN = /^(?:tl-|wr|archer|tp-link|tplink|mercusys|ds-|dvr|nvr|mr-|l8050|l3210|l1300|l1800)/i;
 
 function cleanValue(value = '') {
   return value

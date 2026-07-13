@@ -1,5 +1,12 @@
 import 'server-only';
 
+import { applyCategoryContextUpdate } from '@/lib/supportContextManager';
+import {
+  detectUniversalCategoryContext,
+  type UniversalCategoryContext,
+} from '@/lib/universalCategoryDetector';
+import { findBestProductMatches, type ProductMatchResult } from '@/lib/productModelMatcher';
+import { parseProductInfo, type ProductInfoResult } from '@/lib/productInfoParser';
 import {
   formatUniversalSupportAnswer,
   getUniversalSupportFallback,
@@ -35,6 +42,22 @@ type UniversalRouterInput = {
 type UniversalRouterResult = {
   answer: UniversalSupportAnswer;
   source: 'openai' | 'fallback';
+};
+
+type UniversalRoutingPreparationInput = {
+  message: string;
+  categoryHint?: string;
+  currentState?: Record<string, unknown>;
+};
+
+type UniversalRoutingPreparation = {
+  detectedContext: UniversalCategoryContext;
+  updatedState: Record<string, unknown>;
+  resetApplied: boolean;
+  resetReason?: string;
+  productMatches: ProductMatchResult;
+  productInfo: ProductInfoResult;
+  effectiveCategory: string;
 };
 
 const approvedManualAnswerPatterns = [
@@ -78,6 +101,92 @@ function logUniversalSupportDev(message: string, value?: string | boolean) {
 
 export function isUniversalSupportEnabled() {
   return envFlagEnabled(process.env.ENABLE_UNIVERSAL_AI_SUPPORT);
+}
+
+function normalizeModel(model: string) {
+  return model.replace(/\b(?:ver|version|v)\s*\.?\s*\d+(?:\.\d+)?\b/i, '').trim();
+}
+
+function categoryForMatching(context: UniversalCategoryContext, categoryHint?: string) {
+  if (context.detectedCategory === 'Non Support') return categoryHint || '';
+  if (context.confidence >= 0.6) return context.detectedCategory;
+
+  return categoryHint || context.detectedCategory;
+}
+
+function stateText(state: Record<string, unknown>, key: string) {
+  const value = state[key];
+
+  return typeof value === 'string' ? value : '';
+}
+
+function mergeDetectedProductContext(
+  detectedContext: UniversalCategoryContext,
+  productMatches: ProductMatchResult,
+  productInfo: ProductInfoResult
+): UniversalCategoryContext {
+  const bestProduct = productMatches.bestMatch;
+  const confidentProduct = bestProduct && ['high', 'medium'].includes(productMatches.confidence);
+  const detectedModel = normalizeModel(
+    productInfo.model ||
+      (confidentProduct ? bestProduct?.model || bestProduct?.itemCode || '' : '') ||
+      detectedContext.detectedModel ||
+      ''
+  );
+  const detectedProductName =
+    (confidentProduct ? bestProduct?.itemName : '') ||
+    detectedContext.detectedProductName ||
+    (detectedModel ? detectedModel : undefined);
+
+  return {
+    ...detectedContext,
+    detectedBrand: (confidentProduct ? bestProduct?.brand : '') || detectedContext.detectedBrand,
+    detectedModel: detectedModel || undefined,
+    detectedProductName,
+  };
+}
+
+export function prepareUniversalSupportRouting(input: UniversalRoutingPreparationInput): UniversalRoutingPreparation {
+  const currentState = input.currentState || {};
+  const initialDetectedContext = detectUniversalCategoryContext({
+    message: input.message,
+    previousCategory:
+      stateText(currentState, 'currentCategory') ||
+      stateText(currentState, 'selectedCategory') ||
+      stateText(currentState, 'category') ||
+      input.categoryHint,
+    previousProductName: stateText(currentState, 'currentProductName'),
+    previousModel: stateText(currentState, 'currentModel') || stateText(currentState, 'productModel'),
+    previousProblemName: stateText(currentState, 'currentProblemName') || stateText(currentState, 'issueType'),
+  });
+  const productMatches = findBestProductMatches({
+    text: input.message,
+    categoryHint: categoryForMatching(initialDetectedContext, input.categoryHint),
+    maxResults: 3,
+  });
+  const productInfo = parseProductInfo(input.message);
+  const detectedContext = mergeDetectedProductContext(initialDetectedContext, productMatches, productInfo);
+  const contextUpdate = applyCategoryContextUpdate({
+    message: input.message,
+    currentState,
+    detectedContext,
+  });
+  const effectiveCategory =
+    detectedContext.detectedCategory === 'Non Support'
+      ? input.categoryHint || stateText(currentState, 'selectedCategory') || stateText(currentState, 'category') || ''
+      : stateText(contextUpdate.updatedState, 'selectedCategory') ||
+        stateText(contextUpdate.updatedState, 'category') ||
+        detectedContext.detectedCategory;
+
+  return {
+    detectedContext,
+    updatedState: contextUpdate.updatedState,
+    resetApplied: contextUpdate.resetApplied,
+    resetReason: contextUpdate.resetReason,
+    productMatches,
+    productInfo,
+    effectiveCategory,
+  };
 }
 
 function isLegacyDiagnosticQuestion(result?: ManualKnowledgeLikeResult | null) {
@@ -126,7 +235,6 @@ export function shouldUseUniversalSupport(input: UniversalRouterInput) {
 
   if (!universalEnabled) return false;
   if (input.detectedIntent === 'non_support') return false;
-  if (input.detectedIntent === 'purchase_query') return false;
   if (input.detectedIntent === 'location_reply') return false;
   if (userAskedForEscalationOrFollowUp(input.payload.message)) return false;
   if (manualKnowledgeHasApprovedAnswer(input.manualKnowledgeResult)) return false;

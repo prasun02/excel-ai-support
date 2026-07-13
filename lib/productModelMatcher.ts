@@ -77,6 +77,7 @@ function brandFromText(text: string) {
 function scoreProduct(product: ProductRecord, input: ProductMatchInput): ProductMatch {
   const text = normalize(input.text);
   const compactText = compact(input.text);
+  const textTokens = new Set(tokens(input.text));
   const brandHint = input.brandHint || brandFromText(input.text);
   const candidates = [
     product.productId,
@@ -109,7 +110,7 @@ function scoreProduct(product: ProductRecord, input: ProductMatchInput): Product
       matchedBy.push(`partial:${candidate}`);
     }
 
-    const tokenMatches = tokens(candidate).filter((token) => text.includes(token));
+    const tokenMatches = tokens(candidate).filter((token) => textTokens.has(token));
     if (tokenMatches.length > 0) {
       score += tokenMatches.length * 12;
       matchedBy.push(`tokens:${tokenMatches.join('+')}`);
