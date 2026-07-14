@@ -389,7 +389,7 @@ function WelcomeCard({ isDarkMode }: { isDarkMode: boolean }) {
         </div>
         <h2 className="mt-5 text-2xl font-semibold tracking-normal sm:text-3xl">
           <span className="block">Excel Service AI</span>
-          <span className="block text-lg font-medium text-blue-500 sm:text-xl">Prototype v1.5A</span>
+          <span className="block text-lg font-medium text-blue-500 sm:text-xl">Prototype v2.0 — Universal AI Support</span>
         </h2>
         <p lang="bn" className={`mt-2 text-lg bangla-text ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
           {bn.welcome}
@@ -950,7 +950,7 @@ export default function ChatPage() {
               </h1>
               <div className={`mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm ${mutedTextClass}`}>
                 <FaRegCircle className="h-2 w-2 fill-emerald-500 text-emerald-500" />
-                <span>Prototype v1.5A</span>
+                <span>Prototype v2.0 — Universal AI Support</span>
                 <span className="hidden sm:inline">·</span>
                 <span>Internal Smart Support Prototype</span>
               </div>
