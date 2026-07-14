@@ -46,13 +46,26 @@ Add these values to `.env.local` for local development:
 ```env
 ENABLE_UNIVERSAL_AI_SUPPORT=true
 AI_PROVIDER=openai
-OPENAI_API_KEY=your_openai_api_key_here
 OPENAI_MODEL=gpt-4o-mini
-GEMINI_API_KEY=
+OPENAI_API_KEY=your_openai_api_key_here
 UNIVERSAL_AI_ALLOW_RISKY_STEPS=false
+AI_MAX_OUTPUT_TOKENS=450
+AI_TEMPERATURE=0.3
+GEMINI_API_KEY=
 ```
 
 The OpenAI key is read only inside server route handlers. Do not add it to client components or `NEXT_PUBLIC_` variables.
+
+## Cost Control
+
+- Use `gpt-4o-mini` by default for Universal AI support.
+- Keep output capped with `AI_MAX_OUTPUT_TOKENS=450`.
+- Keep responses deterministic and compact with `AI_TEMPERATURE=0.3`.
+- Do not send the product database, warranty claim history, full chat history, or full support knowledge database to OpenAI.
+- Send only the latest user message, detected category/problem, detected product/model, hardware version, language, and short previous context when needed.
+- Cache repeated same questions for 10 minutes so the same category/problem/product/message does not call OpenAI again.
+- Return local fallback support answers if OpenAI is unavailable, rate-limited, quota-limited, billing-limited, or fails due to network errors.
+- Keep the first OpenAI monthly usage limit low, such as `$10`, and raise it only after reviewing real usage.
 
 ## Disable Universal Mode
 

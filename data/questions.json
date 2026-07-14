@@ -1,5 +1,68 @@
 [
   {
+    "id": "Q-1784021307603",
+    "ticketId": "EXL-2026-9640",
+    "category": "UPS / Inverter",
+    "question": "Marsriva 2KW Inverter",
+    "language": "en",
+    "understood": true,
+    "createdAt": "2026-07-14T09:28:27.603Z"
+  },
+  {
+    "id": "Q-1784021284177",
+    "ticketId": "EXL-2026-9640",
+    "category": "UPS / Inverter",
+    "question": "my inverter backup is low",
+    "language": "en",
+    "understood": true,
+    "createdAt": "2026-07-14T09:28:04.177Z"
+  },
+  {
+    "id": "Q-1784019661385",
+    "ticketId": "EXL-2026-8300",
+    "category": "Camera / DVR / NVR",
+    "question": "not moving",
+    "language": "en",
+    "understood": false,
+    "createdAt": "2026-07-14T09:01:01.385Z"
+  },
+  {
+    "id": "Q-1784019604933",
+    "ticketId": "EXL-2026-8300",
+    "category": "Camera / DVR / NVR",
+    "question": "camera not moving",
+    "language": "en",
+    "understood": true,
+    "createdAt": "2026-07-14T09:00:04.933Z"
+  },
+  {
+    "id": "Q-1783945182087",
+    "ticketId": "EXL-2026-8563",
+    "category": "Printer",
+    "question": "PAPER NOT LOADING",
+    "language": "en",
+    "understood": false,
+    "createdAt": "2026-07-13T12:19:42.087Z"
+  },
+  {
+    "id": "Q-1783945097913",
+    "ticketId": "EXL-2026-8563",
+    "category": "Printer",
+    "question": "PAPER JAM SHOWING IN STATUS MONITOR",
+    "language": "en",
+    "understood": true,
+    "createdAt": "2026-07-13T12:18:17.913Z"
+  },
+  {
+    "id": "Q-1783945052173",
+    "ticketId": "EXL-2026-8563",
+    "category": "Printer",
+    "question": "PAPER JAM",
+    "language": "en",
+    "understood": true,
+    "createdAt": "2026-07-13T12:17:32.173Z"
+  },
+  {
     "id": "Q-1783776395771",
     "ticketId": "EXL-2026-1655",
     "category": "Router / Internet",

@@ -130,11 +130,140 @@ export async function POST(req: Request) {
   const bestProductMatch = getConfidentProductMatch(productMatches);
   const routerProblem = detectRouterProblem({ message: latestMessage });
   const universalSupportEnabled = isUniversalSupportEnabled();
+  const activeCategory = effectiveTicketContext.selectedCategory || effectiveTicketContext.category || effectiveCategory;
+  const isActiveRouterCategory = activeCategory === 'Router / Internet';
   const hasActiveRouterProblem = Boolean(
-    (effectiveTicketContext.selectedCategory || effectiveTicketContext.category || effectiveCategory) === 'Router / Internet' &&
+    isActiveRouterCategory &&
       effectiveTicketContext.issueType
   );
   const routerFollowUpAnswer = hasActiveRouterProblem ? getRouterFollowUpAnswer(latestMessage) : '';
+  const asksForGuidedRouter =
+    isActiveRouterCategory &&
+    (hasActiveRouterProblem || routerProblem.isRouterProblem) &&
+    /(yes|yes i want|solution|guide me|bolo|bolen|chai|start|how update firmware|firmware|update|router page|router ip|192\.168\.0\.1|192\.168\.1\.1|how configure|quick setup)/i.test(latestMessage);
+  logChatDev('UNIVERSAL_AI_ENABLED', universalSupportEnabled);
+  logChatDev('DETECTED_CATEGORY', universalDetected.detectedCategory);
+
+  const isModelOnlyMessage =
+    productMatches.bestMatch &&
+    ['high', 'medium'].includes(productMatches.confidence) &&
+    isSpecificProductMatch(productMatches.bestMatch) &&
+    !routerProblem.isRouterProblem &&
+    !effectiveTicketContext.issueType;
+
+  const result = getNextTroubleshootingResponse({
+    message: latestMessage,
+    selectedCategory: effectiveCategory,
+    ticketState: effectiveTicketContext,
+    importedSimpleKnowledge,
+    aiIntent,
+  });
+  const manualExactFound = manualKnowledgeHasApprovedAnswer(result);
+  logChatDev('MANUAL_EXACT_FOUND', manualExactFound);
+
+  if (manualExactFound) {
+    return apiResult({
+      ticketId,
+      latestMessage,
+      category: result.detectedCategory || effectiveCategory || effectiveTicketContext.category || '',
+      content: result.responseText,
+      language: result.language,
+      ticketContext: result.updatedTicketState,
+      matched: true,
+    });
+  }
+
+  if (universalSupportEnabled) {
+    logChatDev('CALLING_UNIVERSAL_AI_CHAT');
+  }
+
+  const universalResult = await getUniversalSupportResponse({
+    requestUrl: req.url,
+    payload: {
+      message: latestMessage,
+      category: universalDetected.detectedCategory,
+      productName: bestProductMatch?.itemName || universalDetected.detectedProductName || bestProductMatch?.brand || effectiveTicketContext.currentProductName || '',
+      model: normalizeModel(productInfo.model || effectiveTicketContext.productModel || bestProductMatch?.model || universalDetected.detectedModel || ''),
+      detectedProduct: bestProductMatch?.itemName || universalDetected.detectedProductName || bestProductMatch?.brand || effectiveTicketContext.currentProductName || '',
+      detectedModel: normalizeModel(productInfo.model || effectiveTicketContext.productModel || bestProductMatch?.model || universalDetected.detectedModel || ''),
+      detectedProblem: universalDetected.detectedProblem || effectiveTicketContext.currentProblemName || result.detectedIssueType || effectiveTicketContext.issueType || '',
+      hardwareVersion: productInfo.hardwareVersion || effectiveTicketContext.currentHardwareVersion || extractHardwareVersion(effectiveTicketContext.productModel || latestMessage),
+      language: universalDetected.language,
+      previousContext: {
+        currentCategory: effectiveTicketContext.currentCategory || effectiveTicketContext.selectedCategory || effectiveTicketContext.category || effectiveCategory,
+        currentProblemName: effectiveTicketContext.currentProblemName || effectiveTicketContext.issueType || result.detectedIssueType,
+        currentProductName: effectiveTicketContext.currentProductName || bestProductMatch?.itemName || '',
+        currentModel: effectiveTicketContext.currentModel || effectiveTicketContext.productModel || bestProductMatch?.model || '',
+        currentHardwareVersion: effectiveTicketContext.currentHardwareVersion || productInfo.hardwareVersion || '',
+        activeSupportFlow: effectiveTicketContext.activeSupportFlow || effectiveTicketContext.currentFlowId || '',
+      },
+    },
+    manualKnowledgeResult: result,
+    hasActiveFlow: Boolean(effectiveTicketContext.currentFlowId),
+    detectedIntent: detected.intent,
+  });
+  logChatDev('UNIVERSAL_AI_CHAT_OK', Boolean(universalResult));
+
+  if (universalResult) {
+    const answer = universalResult.answer;
+    const ticketCategory = universalAnswerToTicketCategory(
+      answer,
+      effectiveCategory || effectiveTicketContext.category || ''
+    );
+    const productModel = normalizeModel(productInfo.model || effectiveTicketContext.productModel || bestProductMatch?.model || '');
+    const hardwareVersion =
+      productInfo.hardwareVersion ||
+      effectiveTicketContext.currentHardwareVersion ||
+      extractHardwareVersion(effectiveTicketContext.productModel || latestMessage);
+    const resolvedCategory = ticketCategory || answer.category || effectiveCategory || effectiveTicketContext.category || '';
+    const formattedUniversalAnswer = universalAnswerToChatContent(answer);
+
+    logChatDev('UNIVERSAL_AI_CHAT_FORMATTED', Boolean(formattedUniversalAnswer));
+
+    return apiResult({
+      ticketId,
+      latestMessage,
+      category: resolvedCategory,
+      content: formattedUniversalAnswer,
+      language: chatLanguageFromUniversal(answer.language),
+      ticketContext: {
+        ...effectiveTicketContext,
+        selectedCategory: resolvedCategory || effectiveTicketContext.selectedCategory,
+        category: resolvedCategory || effectiveTicketContext.category,
+        currentCategory: resolvedCategory || effectiveTicketContext.currentCategory,
+        currentProblemName: answer.detectedProblem,
+        currentProductId: bestProductMatch?.productId || effectiveTicketContext.currentProductId,
+        currentProductName: answer.productName || bestProductMatch?.itemName || effectiveTicketContext.currentProductName,
+        productModel,
+        currentModel: productModel || effectiveTicketContext.currentModel,
+        currentHardwareVersion: hardwareVersion,
+        serialNumber: productInfo.serialNumber || effectiveTicketContext.serialNumber,
+        currentSN: productInfo.serialNumber || effectiveTicketContext.currentSN || effectiveTicketContext.serialNumber,
+        issueType: answer.detectedProblem,
+        currentFlowId: 'UNIVERSAL_AI_SUPPORT',
+        activeSupportFlow: 'universal_ai_support',
+        activeProblemId: answer.detectedProblem,
+        activeSolutionId: '',
+        activeStepGroupId: '',
+        activeProcedureId: '',
+        currentQuestionIndex: 0,
+        currentStep: 0,
+        askedQuestions: [],
+        userAnswers: [],
+        solutionGiven: answer.type !== 'clarifying_question' && answer.type !== 'non_support',
+        solvedStatus: 'pending',
+        awaitingLocation: false,
+        escalationActive: false,
+        escalationCompleted: false,
+        waitingForGuidedConfirmation: false,
+        waitingForModelOrSticker: false,
+        waitingForProblemDetails: false,
+        waitingForLocation: false,
+      },
+      matched: answer.type !== 'non_support',
+    });
+  }
+
   if (!universalSupportEnabled && routerFollowUpAnswer) {
     return apiResult({
       ticketId,
@@ -146,10 +275,6 @@ export async function POST(req: Request) {
       matched: true,
     });
   }
-
-  const asksForGuidedRouter =
-    hasActiveRouterProblem &&
-    /(yes|yes i want|solution|guide me|bolo|bolen|chai|start|how update firmware|firmware|update|router page|router ip|192\.168\.0\.1|192\.168\.1\.1|how configure|quick setup)/i.test(latestMessage);
 
   if (!universalSupportEnabled && asksForGuidedRouter) {
     const guided = getRouterGuidedProcess({
@@ -191,14 +316,7 @@ export async function POST(req: Request) {
     } satisfies ChatApiResponse);
   }
 
-  const isModelOnlyMessage =
-    productMatches.bestMatch &&
-    ['high', 'medium'].includes(productMatches.confidence) &&
-    isSpecificProductMatch(productMatches.bestMatch) &&
-    !routerProblem.isRouterProblem &&
-    !effectiveTicketContext.issueType;
-
-  if (isModelOnlyMessage) {
+  if (!universalSupportEnabled && isModelOnlyMessage) {
     const bestProduct = productMatches.bestMatch;
     if (!bestProduct) throw new Error('Product match was expected but missing.');
 
@@ -241,102 +359,7 @@ export async function POST(req: Request) {
     } satisfies ChatApiResponse);
   }
 
-  const result = getNextTroubleshootingResponse({
-    message: latestMessage,
-    selectedCategory: effectiveCategory,
-    ticketState: effectiveTicketContext,
-    importedSimpleKnowledge,
-    aiIntent,
-  });
-
-  if (manualKnowledgeHasApprovedAnswer(result)) {
-    return apiResult({
-      ticketId,
-      latestMessage,
-      category: result.detectedCategory || effectiveCategory || effectiveTicketContext.category || '',
-      content: result.responseText,
-      language: result.language,
-      ticketContext: result.updatedTicketState,
-      matched: true,
-    });
-  }
-
-  const universalResult = await getUniversalSupportResponse({
-    requestUrl: req.url,
-    payload: {
-      message: latestMessage,
-      category: result.detectedCategory || effectiveCategory || effectiveTicketContext.category || '',
-      detectedProduct: bestProductMatch?.itemName || universalDetected.detectedProductName || bestProductMatch?.brand || '',
-      detectedModel: normalizeModel(productInfo.model || effectiveTicketContext.productModel || bestProductMatch?.model || universalDetected.detectedModel || ''),
-      detectedProblem: universalDetected.detectedProblem || result.detectedIssueType || effectiveTicketContext.currentProblemName || effectiveTicketContext.issueType || '',
-      hardwareVersion: productInfo.hardwareVersion || effectiveTicketContext.currentHardwareVersion || extractHardwareVersion(effectiveTicketContext.productModel || latestMessage),
-      language: universalDetected.language,
-      previousContext: {
-        currentCategory: effectiveTicketContext.currentCategory || effectiveTicketContext.selectedCategory || effectiveTicketContext.category || effectiveCategory,
-        currentProblemName: effectiveTicketContext.currentProblemName || effectiveTicketContext.issueType || result.detectedIssueType,
-        currentProductName: effectiveTicketContext.currentProductName || bestProductMatch?.itemName || '',
-        currentModel: effectiveTicketContext.currentModel || effectiveTicketContext.productModel || bestProductMatch?.model || '',
-        currentHardwareVersion: effectiveTicketContext.currentHardwareVersion || productInfo.hardwareVersion || '',
-        activeSupportFlow: effectiveTicketContext.activeSupportFlow || effectiveTicketContext.currentFlowId || '',
-      },
-    },
-    manualKnowledgeResult: result,
-    hasActiveFlow: Boolean(effectiveTicketContext.currentFlowId),
-    detectedIntent: detected.intent,
-  });
-
-  if (universalResult) {
-    const answer = universalResult.answer;
-    const ticketCategory = universalAnswerToTicketCategory(
-      answer,
-      result.detectedCategory || effectiveCategory || effectiveTicketContext.category || ''
-    );
-    const productModel = normalizeModel(productInfo.model || effectiveTicketContext.productModel || bestProductMatch?.model || '');
-    const hardwareVersion =
-      productInfo.hardwareVersion ||
-      effectiveTicketContext.currentHardwareVersion ||
-      extractHardwareVersion(effectiveTicketContext.productModel || latestMessage);
-
-    return apiResult({
-      ticketId,
-      latestMessage,
-      category: ticketCategory || answer.category,
-      content: universalAnswerToChatContent(answer),
-      language: chatLanguageFromUniversal(answer.language),
-      ticketContext: {
-        ...effectiveTicketContext,
-        ...result.updatedTicketState,
-        selectedCategory: ticketCategory || result.detectedCategory || effectiveCategory || effectiveTicketContext.selectedCategory,
-        category: ticketCategory || result.detectedCategory || effectiveCategory || effectiveTicketContext.category,
-        currentCategory: ticketCategory || result.detectedCategory || effectiveCategory || effectiveTicketContext.currentCategory,
-        currentProblemName: answer.detectedProblem,
-        currentProductId: bestProductMatch?.productId || effectiveTicketContext.currentProductId,
-        currentProductName: bestProductMatch?.itemName || effectiveTicketContext.currentProductName,
-        productModel,
-        currentModel: productModel || effectiveTicketContext.currentModel,
-        currentHardwareVersion: hardwareVersion,
-        serialNumber: productInfo.serialNumber || effectiveTicketContext.serialNumber,
-        currentSN: productInfo.serialNumber || effectiveTicketContext.currentSN || effectiveTicketContext.serialNumber,
-        issueType: answer.detectedProblem,
-        currentFlowId: 'UNIVERSAL_AI_SUPPORT',
-        activeSupportFlow: 'universal_ai_support',
-        activeProblemId: answer.detectedProblem,
-        currentQuestionIndex: 0,
-        currentStep: 0,
-        askedQuestions: [],
-        userAnswers: [],
-        solutionGiven: answer.type !== 'clarifying_question' && answer.type !== 'non_support',
-        solvedStatus: 'pending',
-        awaitingLocation: false,
-        escalationActive: false,
-        escalationCompleted: false,
-        waitingForGuidedConfirmation: ticketCategory === 'Router / Internet',
-      },
-      matched: answer.type !== 'non_support',
-    });
-  }
-
-  if (routerProblem.isRouterProblem) {
+  if (isActiveRouterCategory && routerProblem.isRouterProblem) {
     if (
       result.matched &&
       !/Please share your router model or upload a clear photo/i.test(result.responseText) &&
@@ -516,6 +539,12 @@ function apiResult(input: {
     ticketContext: input.ticketContext,
     content: input.content,
   } satisfies ChatApiResponse);
+}
+
+function logChatDev(message: string, value?: string | boolean) {
+  if (process.env.NODE_ENV !== 'development') return;
+
+  console.log(value === undefined ? message : `${message}: ${value}`);
 }
 
 function resultLanguage(message: string): 'en' | 'bn' {

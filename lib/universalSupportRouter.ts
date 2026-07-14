@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { formatUniversalSupportAnswer } from '@/lib/formatUniversalSupportAnswer';
 import { applyCategoryContextUpdate } from '@/lib/supportContextManager';
 import {
   detectUniversalCategoryContext,
@@ -8,7 +9,6 @@ import {
 import { findBestProductMatches, type ProductMatchResult } from '@/lib/productModelMatcher';
 import { parseProductInfo, type ProductInfoResult } from '@/lib/productInfoParser';
 import {
-  formatUniversalSupportAnswer,
   getUniversalSupportFallback,
   sanitizeUniversalAnswer,
   universalCategoryToTicketCategory,
@@ -41,7 +41,7 @@ type UniversalRouterInput = {
 
 type UniversalRouterResult = {
   answer: UniversalSupportAnswer;
-  source: 'openai' | 'fallback';
+  source: 'openai' | 'fallback' | 'cache';
 };
 
 type UniversalRoutingPreparationInput = {
@@ -83,11 +83,15 @@ const noUniversalIntentPatterns = [
   /nearest csp/i,
   /\bcsp\b/i,
   /not solved/i,
+  /cannot do/i,
+  /can't do/i,
+  /unable to do/i,
   /still problem/i,
   /same problem/i,
   /kaj hoy nai/i,
   /ekhono problem/i,
 ];
+const FALLBACK_DISPLAY_NOTE = 'AI fallback mode is active because OpenAI API is currently unavailable.';
 
 function envFlagEnabled(value: string | undefined) {
   return String(value || '').toLowerCase() === 'true';
@@ -251,9 +255,9 @@ export async function getUniversalSupportResponse(input: UniversalRouterInput): 
   logUniversalSupportDev('CALLING_UNIVERSAL_AI');
 
   if (!input.requestUrl) {
-    logUniversalSupportDev('UNIVERSAL_AI_RESULT_SOURCE', 'fallback');
+    logUniversalSupportDev('AI_SOURCE', 'fallback');
 
-    return { answer: fallback, source: 'fallback' };
+    return { answer: withFallbackWarning(fallback), source: 'fallback' };
   }
 
   try {
@@ -266,24 +270,41 @@ export async function getUniversalSupportResponse(input: UniversalRouterInput): 
     });
 
     if (!response.ok) {
-      logUniversalSupportDev('UNIVERSAL_AI_RESULT_SOURCE', 'fallback');
+      logUniversalSupportDev('AI_SOURCE', 'fallback');
 
-      return { answer: fallback, source: 'fallback' };
+      return { answer: withFallbackWarning(fallback), source: 'fallback' };
     }
 
     const data = await response.json();
-    const source = response.headers.get('X-Universal-AI-Source') === 'openai'
-      ? 'openai'
-      : 'fallback';
+    const source = normalizeUniversalAiSource(
+      typeof data?.source === 'string'
+        ? data.source
+        : response.headers.get('X-Universal-AI-Source')
+    );
+    const answerData = data?.data && typeof data.data === 'object' ? data.data : data;
 
-    logUniversalSupportDev('UNIVERSAL_AI_RESULT_SOURCE', source);
+    logUniversalSupportDev('AI_SOURCE', source);
 
-    return { answer: sanitizeUniversalAnswer(data, input.payload), source };
+    return { answer: sanitizeUniversalAnswer(answerData, input.payload), source };
   } catch {
-    logUniversalSupportDev('UNIVERSAL_AI_RESULT_SOURCE', 'fallback');
+    logUniversalSupportDev('AI_SOURCE', 'fallback');
 
-    return { answer: fallback, source: 'fallback' };
+    return { answer: withFallbackWarning(fallback), source: 'fallback' };
   }
+}
+
+function normalizeUniversalAiSource(source: string | null): UniversalRouterResult['source'] {
+  if (source === 'openai' || source === 'cache') return source;
+
+  return 'fallback';
+}
+
+function withFallbackWarning(answer: UniversalSupportAnswer): UniversalSupportAnswer {
+  return {
+    ...answer,
+    source: 'fallback',
+    warning: answer.warning || FALLBACK_DISPLAY_NOTE,
+  };
 }
 
 export function universalAnswerToTicketCategory(answer: UniversalSupportAnswer, fallbackCategory = '') {

@@ -18,6 +18,8 @@ export type UniversalSupportCategory = UniversalDetectedCategory;
 export type UniversalSupportRequest = {
   message: string;
   category?: string;
+  productName?: string;
+  model?: string;
   detectedProduct?: string;
   detectedModel?: string;
   detectedProblem?: string;
@@ -46,13 +48,14 @@ export type UniversalSupportAnswer = {
   nextStep: string;
   warning?: string;
   escalationRequired?: boolean;
-  source?: 'openai' | 'fallback';
+  source?: 'openai' | 'fallback' | 'cache';
 };
 
 type ServiceCategory = Exclude<UniversalSupportCategory, 'Non Support'>;
 
 type UniversalFallbackTemplate = {
   defaultProblem: string;
+  message: string;
   possibleCauses: string[];
   safeChecks: string[];
   diagnosticQuestions: string[];
@@ -63,6 +66,7 @@ type UniversalFallbackTemplate = {
 const fallbackCatalog: Record<ServiceCategory, UniversalFallbackTemplate> = {
   'Router / Internet': {
     defaultProblem: 'Router Not Working',
+    message: 'I can help with safe router or internet checks first. This is not a confirmed diagnosis, but these are common causes to verify.',
     possibleCauses: [
       'Adapter or power issue',
       'ISP/ONU issue',
@@ -87,6 +91,7 @@ const fallbackCatalog: Record<ServiceCategory, UniversalFallbackTemplate> = {
   },
   'Camera / DVR / NVR': {
     defaultProblem: 'No View',
+    message: 'Camera, DVR, or NVR no-view issues can come from power, cable, storage, or network conditions. This is not a confirmed diagnosis.',
     possibleCauses: [
       'Power or PoE issue',
       'LAN cable or port issue',
@@ -111,6 +116,7 @@ const fallbackCatalog: Record<ServiceCategory, UniversalFallbackTemplate> = {
   },
   Printer: {
     defaultProblem: 'Not Printing',
+    message: 'Printer issues can come from connection, queue, ink/toner, paper, or driver conditions. This is not a confirmed diagnosis.',
     possibleCauses: [
       'USB/LAN/WiFi connection issue',
       'Driver or print queue issue',
@@ -135,6 +141,7 @@ const fallbackCatalog: Record<ServiceCategory, UniversalFallbackTemplate> = {
   },
   'UPS / Inverter': {
     defaultProblem: 'Backup Low',
+    message: 'Low backup can happen for several reasons. This is not a confirmed diagnosis, but you can check a few safe basics first.',
     possibleCauses: [
       'Weak or aged battery',
       'Connected load is higher than rated capacity',
@@ -161,6 +168,7 @@ const fallbackCatalog: Record<ServiceCategory, UniversalFallbackTemplate> = {
   },
   Warranty: {
     defaultProblem: 'Warranty Check',
+    message: 'Warranty status cannot be approved by AI. It needs model, serial number, invoice, or Excel warranty portal/CSP verification.',
     possibleCauses: [
       'Warranty status needs serial/invoice verification',
       'Product may be inside or outside warranty period',
@@ -183,6 +191,7 @@ const fallbackCatalog: Record<ServiceCategory, UniversalFallbackTemplate> = {
   },
   'New Product Purchase': {
     defaultProblem: 'Purchase Query',
+    message: 'I can help collect the product requirement for Excel sales guidance, but final price and stock need sales/dealer confirmation.',
     possibleCauses: [
       'Exact product requirement is not clear yet',
       'Price and stock can vary by model and location',
@@ -202,6 +211,7 @@ const fallbackCatalog: Record<ServiceCategory, UniversalFallbackTemplate> = {
   },
   'Other Product': {
     defaultProblem: 'Not Working',
+    message: 'For this Excel product issue, I can suggest safe general checks first. This is not a confirmed diagnosis.',
     possibleCauses: [
       'Power issue',
       'Cable or connection issue',
@@ -300,8 +310,8 @@ function detectContext(input: UniversalSupportRequest) {
   return detectUniversalCategoryContext({
     message: input.message,
     previousCategory: input.category || input.previousContext?.currentCategory,
-    previousProductName: input.detectedProduct || input.previousContext?.currentProductName,
-    previousModel: input.detectedModel || input.previousContext?.currentModel,
+    previousProductName: input.productName || input.detectedProduct || input.previousContext?.currentProductName,
+    previousModel: input.model || input.detectedModel || input.previousContext?.currentModel,
     previousProblemName: input.detectedProblem || input.previousContext?.currentProblemName,
   });
 }
@@ -371,7 +381,8 @@ export function isUniversalRiskyRequest(input: UniversalSupportRequest) {
 
 export function hasUniversalModelContext(input: UniversalSupportRequest) {
   return Boolean(
-    input.detectedModel?.trim() ||
+    input.model?.trim() ||
+      input.detectedModel?.trim() ||
       input.hardwareVersion?.trim() ||
       input.previousContext?.currentModel?.trim() ||
       input.previousContext?.currentHardwareVersion?.trim()
@@ -396,7 +407,10 @@ function getTemplate(category: UniversalSupportCategory) {
 }
 
 function getProductName(input: UniversalSupportRequest) {
-  return [input.detectedProduct, input.detectedModel].filter(Boolean).join(' ').trim() || undefined;
+  return [input.productName || input.detectedProduct, input.model || input.detectedModel]
+    .filter(Boolean)
+    .join(' ')
+    .trim() || undefined;
 }
 
 function localizedIntro(language: UniversalSupportLanguage, type: UniversalSupportType) {
@@ -501,7 +515,7 @@ export function getUniversalSupportFallback(input: UniversalSupportRequest): Uni
       category,
       detectedProblem: problem,
       productName: getProductName(input) || context.detectedProductName,
-      message: localizedIntro(language, type),
+      message: template.message || localizedIntro(language, type),
       possibleCauses: template.possibleCauses,
       safeChecks: template.safeChecks,
       diagnosticQuestions: template.diagnosticQuestions,
@@ -561,21 +575,14 @@ export function sanitizeUniversalAnswer(value: unknown, input: UniversalSupportR
 export function formatUniversalSupportAnswer(answer: UniversalSupportAnswer) {
   if (answer.type === 'non_support') return answer.message;
 
-  const useEnglish = answer.language === 'en';
-  const causesHeading = useEnglish ? 'This may happen due to:' : 'Ei problem hote pare:';
-  const checksHeading = useEnglish ? 'Safe checks you can try first:' : 'Safe check korte paren:';
-  const questionsHeading = useEnglish ? 'To understand better, please answer:' : 'Bujte help korbe, egulo bolun:';
-  const nextHeading = 'Next:';
-  const safetyHeading = 'Safety note:';
   const numberLines = (items: string[]) => items.map((item, index) => `${index + 1}. ${item}`).join('\n');
 
   return [
-    `Detected issue:\n${answer.category} -> ${answer.detectedProblem}`,
-    answer.productName ? `Device:\n${answer.productName}` : '',
-    answer.possibleCauses.length ? `${causesHeading}\n\n${numberLines(answer.possibleCauses)}` : '',
-    answer.safeChecks.length ? `${checksHeading}\n\n${numberLines(answer.safeChecks)}` : '',
-    answer.diagnosticQuestions.length ? `${questionsHeading}\n\n${numberLines(answer.diagnosticQuestions)}` : '',
-    `${nextHeading}\n${answer.nextStep}`,
-    answer.warning ? `${safetyHeading}\n${answer.warning}` : '',
+    `Detected issue:\n${answer.category} \u2192 ${answer.detectedProblem}`,
+    answer.possibleCauses.length ? `This may happen due to:\n${numberLines(answer.possibleCauses)}` : '',
+    answer.safeChecks.length ? `Safe checks you can try first:\n${numberLines(answer.safeChecks)}` : '',
+    answer.diagnosticQuestions.length ? `To understand better, please answer:\n${numberLines(answer.diagnosticQuestions)}` : '',
+    `Next:\n${answer.nextStep}`,
+    answer.warning ? `Safety note:\n${answer.warning}` : '',
   ].filter(Boolean).join('\n\n');
 }

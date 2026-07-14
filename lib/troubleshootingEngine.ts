@@ -170,6 +170,7 @@ function isNotSolved(message: string) {
 
   return [
     'no', 'not solved', 'no not solved', 'still problem', 'not fixed', 'same problem', 'kaj hoy nai', 'ekhono problem',
+    'cannot do', "can't do", 'cant do', 'unable to do',
     '\u09a8\u09be', '\u09b8\u09ae\u09be\u09a7\u09be\u09a8 \u09b9\u09df\u09a8\u09bf', '\u098f\u0996\u09a8\u09cb \u09b8\u09ae\u09b8\u09cd\u09af\u09be', '\u09a0\u09bf\u0995 \u09b9\u09df\u09a8\u09bf',
   ].some((word) => text.includes(normalizeText(word)));
 }

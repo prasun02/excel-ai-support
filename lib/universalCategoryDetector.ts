@@ -19,6 +19,7 @@ export type UniversalCategoryContextInput = {
 };
 
 export type UniversalCategoryContext = {
+  category: UniversalDetectedCategory;
   detectedCategory: UniversalDetectedCategory;
   detectedBrand?: string;
   detectedModel?: string;
@@ -498,6 +499,7 @@ export function detectUniversalCategoryContext(input: UniversalCategoryContextIn
   ].filter(Boolean);
 
   return {
+    category: detectedCategory,
     detectedCategory,
     detectedBrand,
     detectedModel,
@@ -509,5 +511,18 @@ export function detectUniversalCategoryContext(input: UniversalCategoryContextIn
     productChanged,
     shouldResetSupportFlow,
     reason: reasonParts.join('; '),
+  };
+}
+
+export function detectUniversalCategory(input: UniversalCategoryContextInput) {
+  const context = detectUniversalCategoryContext(input);
+
+  return {
+    category: context.category,
+    detectedProblem: context.detectedProblem || '',
+    language: context.language,
+    confidence: context.confidence,
+    categoryChanged: context.categoryChanged,
+    shouldResetSupportFlow: context.shouldResetSupportFlow,
   };
 }
